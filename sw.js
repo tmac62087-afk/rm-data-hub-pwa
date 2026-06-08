@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rm-stats-v1';
+const CACHE_NAME = 'fr-stats-v1';
 const urlsToCache = [
   '/',
   '/index.html'

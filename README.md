@@ -1,15 +1,15 @@
-# Real Madrid Stats - Product Package
+# France World Cup Stats - Product Package
 
 ## 产品概述
 
-面向全球皇马球迷的深度数据中枢App，差异化定位为「硬核球迷的数据大脑」。
+面向全球法国队球迷的深度数据中枢App，聚焦2026世界杯期间为Les Bleus球迷提供实时数据、战术分析和社区互动。
 
 ---
 
 ## 项目结构
 
 ```
-rm-data-hub/
+france-wc-stats/
 ├── pwa/                          # 立即可用的PWA版本
 │   ├── index.html               # 主应用（完整功能）
 │   ├── manifest.json            # PWA配置
@@ -32,7 +32,7 @@ rm-data-hub/
 │
 └── backend/                      # Python后端API
     ├── app.py                   # Flask REST API
-    ├── scraper.py               # 皇马官网数据爬虫
+    ├── scraper.py               # 数据爬虫
     └── requirements.txt         # Python依赖
 ```
 
@@ -109,15 +109,15 @@ python app.py
 
 ## 数据源
 
-- **主数据源**: https://www.realmadrid.com/es-ES
-- **补充数据**: SofaScore API（实时比分）、Transfermarkt（估值）
+- **主数据源**: https://www.fff.fr/
+- **补充数据**: FIFA官方API（实时比分）、Transfermarkt（估值）
 - **数据更新频率**: 球员信息每2小时、比赛结果实时、新闻每小时
 
 ---
 
 ## 版权合规
 
-- App为非官方球迷应用，不隶属皇马俱乐部
+- App为非官方球迷应用，不隶属法国足协
 - 不使用官方队徽作为App图标
 - 数据来源为官网公开信息（事实数据，不受版权保护）
 - App描述中明确标注 "This is an unofficial fan app"

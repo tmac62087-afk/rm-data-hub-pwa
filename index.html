@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="RM Stats">
+<meta name="apple-mobile-web-app-title" content="FR Stats">
 <meta name="theme-color" content="#0A0A0F">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%2300529F' rx='36'/%3E%3Ctext x='90' y='108' font-family='system-ui' font-size='68' font-weight='900' fill='white' text-anchor='middle'%3ERM%3C/text%3E%3C/svg%3E">
-<title>Real Madrid Stats</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23002395' rx='36'/%3E%3Ctext x='90' y='108' font-family='system-ui' font-size='68' font-weight='900' fill='white' text-anchor='middle'%3EFR%3C/text%3E%3C/svg%3E">
+<title>France World Cup Stats</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -21,7 +21,7 @@ tailwind.config = {
     extend: {
       fontFamily: { sans: ['Inter','system-ui'], mono: ['JetBrains Mono','monospace'] },
       colors: {
-        rm: { blue:'#00529F', gold:'#D4AF37', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' }
+        rm: { blue:'#002395', gold:'#ED2939', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' }
       }
     }
   }
@@ -32,7 +32,7 @@ tailwind.config = {
 body{background:#000;font-family:'Inter',sans-serif;overscroll-behavior:none;}
 .scrollbar-hide::-webkit-scrollbar{display:none;}
 .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none;}
-.text-gradient-gold{background:linear-gradient(135deg,#D4AF37,#F0D878);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.text-gradient-gold{background:linear-gradient(135deg,#ED2939,#F0D878);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .glass{background:rgba(26,26,36,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
 .field-bg{background:linear-gradient(180deg,#1a4a1a 0%,#0d2e0d 100%);position:relative;}
 .field-bg::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
@@ -63,59 +63,58 @@ const Storage = {
 // ==================== DATA ====================
 const playersData = {
   goalkeepers: [
-    { id:'courtois', name:'Thibaut Courtois', short:'Courtois', number:1, pos:'GK', country:'BE', age:33, matches:38, goals:0, assists:0, minutes:3420, saves:98, cleanSheets:18, passAcc:72 },
-    { id:'lunin', name:'Andriy Lunin', short:'Lunin', number:13, pos:'GK', country:'UA', age:26, matches:12, goals:0, assists:0, minutes:1080, saves:31, cleanSheets:5, passAcc:68 },
+    { id:'maignan', name:'Mike Maignan', short:'Maignan', number:16, pos:'GK', country:'FR', age:30, matches:28, goals:0, assists:0, minutes:2520, saves:87, cleanSheets:14, passAcc:74 },
+    { id:'areola', name:'Alphonse Areola', short:'Areola', number:23, pos:'GK', country:'FR', age:32, matches:6, goals:0, assists:0, minutes:540, saves:18, cleanSheets:3, passAcc:70 },
   ],
   defenders: [
-    { id:'militao', name:'Eder Militao', short:'Militao', number:3, pos:'CB', country:'BR', age:27, matches:32, goals:2, assists:1, minutes:2743, tackles:45, interceptions:38, duelsWon:68, passAcc:89 },
-    { id:'trent', name:'Trent Alexander-Arnold', short:'Trent', number:12, pos:'RB', country:'GB', age:26, matches:35, goals:3, assists:12, minutes:3015, tackles:38, interceptions:25, duelsWon:55, passAcc:84 },
-    { id:'asencio', name:'Raul Asencio', short:'Asencio', number:17, pos:'CB', country:'ES', age:22, matches:18, goals:1, assists:0, minutes:1240, tackles:28, interceptions:22, duelsWon:60, passAcc:86 },
-    { id:'carreras', name:'Alvaro Carreras', short:'Carreras', number:18, pos:'LB', country:'ES', age:22, matches:22, goals:0, assists:3, minutes:1650, tackles:34, interceptions:28, duelsWon:58, passAcc:82 },
-    { id:'frangarcia', name:'Fran Garcia', short:'Fran Garcia', number:20, pos:'LB', country:'ES', age:25, matches:28, goals:1, assists:4, minutes:2100, tackles:41, interceptions:30, duelsWon:62, passAcc:83 },
-    { id:'rudiger', name:'Antonio Rudiger', short:'Rudiger', number:22, pos:'CB', country:'DE', age:32, matches:40, goals:3, assists:2, minutes:3510, tackles:52, interceptions:45, duelsWon:71, passAcc:87 },
-    { id:'mendy', name:'Ferland Mendy', short:'Mendy', number:23, pos:'LB', country:'FR', age:30, matches:30, goals:0, assists:3, minutes:2430, tackles:36, interceptions:32, duelsWon:64, passAcc:85 },
-    { id:'huijsen', name:'Dean Huijsen', short:'Huijsen', number:24, pos:'CB', country:'NL', age:20, matches:15, goals:2, assists:0, minutes:1050, tackles:22, interceptions:18, duelsWon:56, passAcc:88 },
+    { id:'kounde', name:'Jules Kounde', short:'Kounde', number:5, pos:'RB', country:'FR', age:26, matches:38, goals:2, assists:5, minutes:3240, tackles:48, interceptions:32, duelsWon:65, passAcc:88 },
+    { id:'upamecano', name:'Dayot Upamecano', short:'Upamecano', number:2, pos:'CB', country:'FR', age:26, matches:32, goals:1, assists:1, minutes:2743, tackles:42, interceptions:38, duelsWon:70, passAcc:87 },
+    { id:'konate', name:'Ibrahima Konate', short:'Konate', number:24, pos:'CB', country:'FR', age:25, matches:28, goals:0, assists:0, minutes:2240, tackles:38, interceptions:30, duelsWon:72, passAcc:86 },
+    { id:'theo', name:'Theo Hernandez', short:'Theo H.', number:22, pos:'LB', country:'FR', age:28, matches:36, goals:4, assists:7, minutes:3100, tackles:44, interceptions:28, duelsWon:68, passAcc:84 },
+    { id:'pavard', name:'Benjamin Pavard', short:'Pavard', number:21, pos:'CB', country:'FR', age:29, matches:26, goals:2, assists:2, minutes:2080, tackles:34, interceptions:26, duelsWon:64, passAcc:89 },
+    { id:'clauss', name:'Jonathan Clauss', short:'Clauss', number:15, pos:'RB', country:'FR', age:32, matches:20, goals:1, assists:4, minutes:1600, tackles:30, interceptions:22, duelsWon:58, passAcc:82 },
+    { id:'digne', name:'Lucas Digne', short:'Digne', number:18, pos:'LB', country:'FR', age:31, matches:14, goals:0, assists:3, minutes:1120, tackles:24, interceptions:20, duelsWon:60, passAcc:83 },
   ],
   midfielders: [
-    { id:'bellingham', name:'Jude Bellingham', short:'Bellingham', number:5, pos:'CM', country:'GB', age:22, matches:42, goals:18, assists:8, minutes:3650, tackles:55, interceptions:30, duelsWon:65, passAcc:91, keyPasses:52 },
-    { id:'camavinga', name:'Eduardo Camavinga', short:'Camavinga', number:6, pos:'CM', country:'FR', age:22, matches:34, goals:2, assists:4, minutes:2450, tackles:62, interceptions:35, duelsWon:68, passAcc:88, keyPasses:28 },
-    { id:'valverde', name:'Federico Valverde', short:'Valverde', number:8, pos:'CM', country:'UY', age:27, matches:44, goals:12, assists:9, minutes:3820, tackles:68, interceptions:40, duelsWon:70, passAcc:90, keyPasses:48 },
-    { id:'tchouameni', name:'Aurelien Tchouameni', short:'Tchouameni', number:14, pos:'DM', country:'FR', age:25, matches:36, goals:1, assists:3, minutes:2880, tackles:72, interceptions:50, duelsWon:66, passAcc:89, keyPasses:22 },
-    { id:'guler', name:'Arda Guler', short:'Guler', number:15, pos:'AM', country:'TR', age:21, matches:28, goals:8, assists:6, minutes:1680, tackles:18, interceptions:12, duelsWon:52, passAcc:85, keyPasses:38 },
-    { id:'ceballos', name:'Dani Ceballos', short:'Ceballos', number:19, pos:'CM', country:'ES', age:28, matches:20, goals:1, assists:2, minutes:980, tackles:25, interceptions:15, duelsWon:58, passAcc:87, keyPasses:20 },
+    { id:'tchouameni', name:'Aurelien Tchouameni', short:'Tchouameni', number:8, pos:'DM', country:'FR', age:25, matches:36, goals:2, assists:3, minutes:3020, tackles:68, interceptions:48, duelsWon:66, passAcc:89, keyPasses:28 },
+    { id:'camavinga', name:'Eduardo Camavinga', short:'Camavinga', number:6, pos:'CM', country:'FR', age:22, matches:34, goals:2, assists:4, minutes:2450, tackles:62, interceptions:35, duelsWon:68, passAcc:88, keyPasses:30 },
+    { id:'rabiot', name:'Adrien Rabiot', short:'Rabiot', number:14, pos:'CM', country:'FR', age:30, matches:32, goals:5, assists:3, minutes:2560, tackles:50, interceptions:32, duelsWon:64, passAcc:87, keyPasses:26 },
+    { id:'griezmann', name:'Antoine Griezmann', short:'Griezmann', number:7, pos:'AM', country:'FR', age:35, matches:38, goals:12, assists:14, minutes:3240, tackles:42, interceptions:28, duelsWon:60, passAcc:85, keyPasses:56 },
+    { id:'kante', name:'N\'Golo Kante', short:'Kante', number:13, pos:'DM', country:'FR', age:34, matches:28, goals:1, assists:2, minutes:2100, tackles:58, interceptions:42, duelsWon:62, passAcc:86, keyPasses:18 },
+    { id:'yfofana', name:'Youssouf Fofana', short:'Y.Fofana', number:19, pos:'CM', country:'FR', age:25, matches:20, goals:1, assists:2, minutes:1400, tackles:32, interceptions:22, duelsWon:60, passAcc:84, keyPasses:20 },
   ],
   forwards: [
-    { id:'vinijr', name:'Vinicius Jr.', short:'Vini Jr.', number:7, pos:'LW', country:'BR', age:25, matches:43, goals:24, assists:14, minutes:3650, tackles:28, interceptions:15, duelsWon:62, passAcc:82, keyPasses:68 },
-    { id:'mbappe', name:'Kylian Mbappe', short:'Mbappe', number:10, pos:'ST', country:'FR', age:27, matches:44, goals:42, assists:3, minutes:3620, tackles:12, interceptions:8, duelsWon:48, passAcc:78, keyPasses:35 },
-    { id:'rodrygo', name:'Rodrygo Goes', short:'Rodrygo', number:11, pos:'RW', country:'BR', age:24, matches:38, goals:14, assists:10, minutes:2850, tackles:22, interceptions:14, duelsWon:55, passAcc:84, keyPasses:42 },
-    { id:'gonzalo', name:'Gonzalo Garcia', short:'Gonzalo', number:16, pos:'ST', country:'ES', age:21, matches:16, goals:5, assists:1, minutes:720, tackles:8, interceptions:5, duelsWon:50, passAcc:80, keyPasses:12 },
-    { id:'brahim', name:'Brahim Diaz', short:'Brahim', number:21, pos:'RW', country:'MA', age:25, matches:30, goals:8, assists:7, minutes:1680, tackles:20, interceptions:12, duelsWon:54, passAcc:83, keyPasses:32 },
-    { id:'mastantuono', name:'Franco Mastantuono', short:'Mastantuono', number:30, pos:'LW', country:'AR', age:18, matches:8, goals:2, assists:1, minutes:340, tackles:5, interceptions:3, duelsWon:45, passAcc:79, keyPasses:8 },
-    { id:'endrick', name:'Endrick Felipe', short:'Endrick', number:0, pos:'ST', country:'BR', age:19, matches:22, goals:9, assists:2, minutes:890, tackles:10, interceptions:6, duelsWon:52, passAcc:77, keyPasses:15 },
+    { id:'mbappe', name:'Kylian Mbappe', short:'Mbappe', number:10, pos:'ST', country:'FR', age:27, matches:42, goals:38, assists:8, minutes:3650, tackles:14, interceptions:10, duelsWon:50, passAcc:80, keyPasses:42 },
+    { id:'dembele', name:'Ousmane Dembele', short:'Dembele', number:11, pos:'RW', country:'FR', age:28, matches:36, goals:16, assists:12, minutes:2900, tackles:22, interceptions:14, duelsWon:58, passAcc:82, keyPasses:48 },
+    { id:'kolomuani', name:'Randal Kolo Muani', short:'Kolo Muani', number:12, pos:'ST', country:'FR', age:26, matches:28, goals:10, assists:4, minutes:1960, tackles:18, interceptions:12, duelsWon:56, passAcc:78, keyPasses:24 },
+    { id:'barcola', name:'Bradley Barcola', short:'Barcola', number:20, pos:'LW', country:'FR', age:22, matches:22, goals:8, assists:6, minutes:1540, tackles:16, interceptions:10, duelsWon:54, passAcc:81, keyPasses:32 },
+    { id:'mthuram', name:'Marcus Thuram', short:'Thuram', number:15, pos:'ST', country:'FR', age:28, matches:30, goals:12, assists:5, minutes:2340, tackles:20, interceptions:14, duelsWon:58, passAcc:79, keyPasses:30 },
+    { id:'olise', name:'Michael Olise', short:'Olise', number:25, pos:'RW', country:'FR', age:23, matches:16, goals:4, assists:5, minutes:1080, tackles:12, interceptions:8, duelsWon:52, passAcc:83, keyPasses:28 },
   ],
 };
 
 const allPlayers = [...playersData.goalkeepers, ...playersData.defenders, ...playersData.midfielders, ...playersData.forwards];
 
 const matchesData = [
-  { id:1, home:'Real Madrid', away:'Barcelona', homeScore:3, awayScore:1, date:'2026-05-25', comp:'La Liga', status:'FT', motm:'Mbappe', possession:{h:58,a:42}, shots:{h:18,a:9}, sot:{h:8,a:3}, corners:{h:7,a:3}, fouls:{h:12,a:15} },
-  { id:2, home:'Man City', away:'Real Madrid', homeScore:1, awayScore:2, date:'2026-05-20', comp:'UCL Final', status:'FT', motm:'Valverde', possession:{h:52,a:48}, shots:{h:14,a:16}, sot:{h:5,a:7}, corners:{h:5,a:6}, fouls:{h:14,a:11} },
-  { id:3, home:'Real Madrid', away:'Atletico Madrid', homeScore:null, awayScore:null, date:'2026-06-15', comp:'La Liga', status:'UPCOMING', time:'21:00 CET' },
+  { id:1, home:'France', away:'Canada', homeScore:null, awayScore:null, date:'2026-06-12', comp:'World Cup Group I', status:'UPCOMING', time:'20:00 EST' },
+  { id:2, home:'France', away:'Israel', homeScore:null, awayScore:null, date:'2026-06-18', comp:'World Cup Group I', status:'UPCOMING', time:'18:00 EST' },
+  { id:3, home:'France', away:'New Zealand', homeScore:null, awayScore:null, date:'2026-06-24', comp:'World Cup Group I', status:'UPCOMING', time:'15:00 EST' },
 ];
 
 const newsData = [
-  { id:1, title:'Mbappe wins Pichichi Trophy with 42 goals', time:'2h ago', tag:'Awards', icon:'trophy' },
-  { id:2, title:'Arda Guler named UCL Breakthrough Player', time:'5h ago', tag:'UCL', icon:'flame' },
-  { id:3, title:'New home kit revealed for 2026-27 season', time:'1d ago', tag:'Club', icon:'star' },
-  { id:4, title:'Valverde goal vs City voted best of UCL', time:'2d ago', tag:'UCL', icon:'target' },
-  { id:5, title:'Carvajal receives emotional Bernabeu farewell', time:'3d ago', tag:'Club', icon:'heart' },
+  { id:1, title:'Mbappe named France captain for World Cup 2026', excerpt:'Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title.', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400', date:'2026-06-05', category:'National Team' },
+  { id:2, title:'France unveils 26-man World Cup squad', excerpt:'Deschamps includes surprise call-ups as Les Bleus aim for glory in North America.', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400', date:'2026-06-04', category:'Squad' },
+  { id:3, title:'Griezmann: "This is my final World Cup"', excerpt:'The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage.', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400', date:'2026-06-03', category:'Interview' },
+  { id:4, title:'Training camp opens in Clairefontaine', excerpt:'Les Bleus begin intensive preparations ahead of departure to the United States.', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=400', date:'2026-06-02', category:'Training' },
+  { id:5, title:'Tactical analysis: France's 4-2-3-1 shape', excerpt:'How Deschamps plans to balance attack and defence with a star-studded lineup.', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=400', date:'2026-06-01', category:'Tactics' },
 ];
 
 const topicsData = [
-  { id:1, author:'Madridista2025', avatar:'M', title:'Should Arda start against Atletico?', replies:47, likes:128, time:'2h ago', hot:true },
-  { id:2, author:'HalaMadrid99', avatar:'H', title:'Mbappe vs Vini: who had the better season?', replies:89, likes:234, time:'5h ago', hot:true },
-  { id:3, author:'BernabeuFaithful', avatar:'B', title:'Tactical analysis: Trent impact on our right flank', replies:32, likes:95, time:'8h ago', hot:false },
-  { id:4, author:'LaDecimaFan', avatar:'L', title:'Predicting next season starting XI', replies:156, likes:412, time:'1d ago', hot:true },
+  { id:1, title:'Will France win the 2026 World Cup?', author:'BleuFan_98', comments:342, likes:890, hot:true },
+  { id:2, title:'Mbappe vs Messi: Who scores more in the group stage?', author:'FootballAnalyst', comments:128, likes:456, hot:true },
+  { id:3, title:'Deschamps starting XI predictions', author:'Tactician_FR', comments:89, likes:234, hot:false },
+  { id:4, title:'France vs Argentina final rematch?', author:'WorldCupDreamer', comments:567, likes:1234, hot:true },
+  { id:5, title:'Best French performance at a World Cup?', author:'LesBleusHistory', comments:45, likes:178, hot:false },
 ];
 
 const countryFlags = { 'ES':'🇪🇸','FR':'🇫🇷','BR':'🇧🇷','GB':'🇬🇧','BE':'🇧🇪','UA':'🇺🇦','DE':'🇩🇪','NL':'🇳🇱','UY':'🇺🇾','TR':'🇹🇷','MA':'🇲🇦','AR':'🇦🇷' };
@@ -154,7 +153,7 @@ function Icon({name,size=20,className=''}){
 
 function PlayerAvatar({name,size=40}){
   const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-  const colors=['#00529F','#D4AF37','#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
+  const colors=['#002395','#ED2939','#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
   const color=colors[name.length%colors.length];
   return (
     <div className="rounded-full flex items-center justify-center font-bold text-white select-none" style={{width:size,height:size,background:color,fontSize:size*0.35}}>
@@ -178,7 +177,7 @@ function MatchCenter(){
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-white text-2xl font-bold">Match Center</h1>
-            <p className="text-rm-muted text-sm mt-0.5">Season 2025/26</p>
+            <p className="text-rm-muted text-sm mt-0.5">World Cup 2026</p>
           </div>
           <div className="flex gap-2">
             <button className="w-10 h-10 rounded-full bg-rm-card flex items-center justify-center text-white hover:bg-rm-border transition-colors">
@@ -209,7 +208,7 @@ function MatchCenter(){
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-2 backdrop-blur-sm">
-                  <span className="text-xl font-black text-white">RM</span>
+                  <span className="text-xl font-black text-white">FR</span>
                 </div>
                 <p className="text-white font-semibold text-sm">{match.home}</p>
               </div>
@@ -231,7 +230,7 @@ function MatchCenter(){
               </div>
               <div className="text-center flex-1">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-2 backdrop-blur-sm">
-                  <span className="text-lg font-black text-white">{match.away==='Barcelona'?'FCB':match.away==='Atletico Madrid'?'ATM':'MCI'}</span>
+                  <span className="text-lg font-black text-white">{match.away==='ISR'?'FCB':match.away==='CAN'?'ATM':'NZL'}</span>
                 </div>
                 <p className="text-white font-semibold text-sm">{match.away}</p>
               </div>
@@ -328,7 +327,7 @@ function Squad({onPlayerSelect}){
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
         <h1 className="text-white text-2xl font-bold">Squad</h1>
-        <p className="text-rm-muted text-sm mt-0.5">2025/26 Season · {allPlayers.length} Players</p>
+        <p className="text-rm-muted text-sm mt-0.5">World Cup 2026 · {allPlayers.length} Players</p>
       </div>
 
       <div className="px-5 mb-4">
@@ -373,8 +372,8 @@ function PlayerDetail({player,onBack}){
   const tabs={overview:'Overview',stats:'Stats',career:'Career'};
 
   const statCats=[
-    {label:'La Liga',matches:Math.floor(player.matches*0.7),goals:Math.floor(player.goals*0.6),assists:Math.floor(player.assists*0.7),minutes:Math.floor(player.minutes*0.7),saves:Math.floor((player.saves||0)*0.65)},
-    {label:'Champions League',matches:Math.floor(player.matches*0.25),goals:Math.floor(player.goals*0.35),assists:Math.floor(player.assists*0.25),minutes:Math.floor(player.minutes*0.25),saves:Math.floor((player.saves||0)*0.3)},
+    {label:'World Cup',matches:Math.floor(player.matches*0.7),goals:Math.floor(player.goals*0.6),assists:Math.floor(player.assists*0.7),minutes:Math.floor(player.minutes*0.7),saves:Math.floor((player.saves||0)*0.65)},
+    {label:'Friendly',matches:Math.floor(player.matches*0.25),goals:Math.floor(player.goals*0.35),assists:Math.floor(player.assists*0.25),minutes:Math.floor(player.minutes*0.25),saves:Math.floor((player.saves||0)*0.3)},
     {label:'Copa del Rey',matches:Math.floor(player.matches*0.05),goals:Math.floor(player.goals*0.05),assists:Math.floor(player.assists*0.05),minutes:Math.floor(player.minutes*0.05),saves:Math.floor((player.saves||0)*0.05)},
   ];
 
@@ -468,11 +467,11 @@ function PlayerDetail({player,onBack}){
                     const angle=(Math.PI*2*i/5)-Math.PI/2;
                     const r=(d.value/maxRadar)*80;
                     return `${100+r*Math.cos(angle)},${100+r*Math.sin(angle)}`;
-                  }).join(' ')} fill="rgba(0,82,159,0.25)" stroke="#00529F" strokeWidth="2"/>
+                  }).join(' ')} fill="rgba(0,82,159,0.25)" stroke="#002395" strokeWidth="2"/>
                   {radarData.map((d,i)=>{
                     const angle=(Math.PI*2*i/5)-Math.PI/2;
                     const r=(d.value/maxRadar)*80;
-                    return <g key={i}><circle cx={100+r*Math.cos(angle)} cy={100+r*Math.sin(angle)} r="3" fill="#D4AF37"/>
+                    return <g key={i}><circle cx={100+r*Math.cos(angle)} cy={100+r*Math.sin(angle)} r="3" fill="#ED2939"/>
                     <text x={100+95*Math.cos(angle)} y={100+95*Math.sin(angle)} fill="#6B6B7B" fontSize="10" textAnchor="middle" dominantBaseline="middle">{d.label}</text></g>;
                   })}
                 </svg>
@@ -528,7 +527,7 @@ function PlayerDetail({player,onBack}){
             <div className="relative pl-6 space-y-6">
               <div className="absolute left-2 top-2 bottom-2 w-px bg-rm-border"></div>
               {[
-                {year:'2024 - Present',club:'Real Madrid',desc:`${player.matches} apps · ${player.goals} goals`,active:true},
+                {year:'2024 - Present',club:'France National Team',desc:`${player.matches} apps · ${player.goals} goals`,active:true},
                 {year:'2022 - 2024',club:'Previous Club',desc:'48 apps · 22 goals',active:false},
                 {year:'2020 - 2022',club:'Youth Career',desc:'Academy progression',active:false},
               ].map((item,i)=> (
@@ -691,7 +690,7 @@ function Data(){
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
         <h1 className="text-white text-2xl font-bold">Data</h1>
-        <p className="text-rm-muted text-sm mt-0.5">Season 2025/26 Rankings</p>
+        <p className="text-rm-muted text-sm mt-0.5">World Cup 2026 Rankings</p>
       </div>
 
       <div className="px-5 mb-4">
@@ -735,7 +734,7 @@ function Data(){
           {[
             {label:'Goals Scored',value:'112',sub:'+18% vs last season',good:true},
             {label:'Goals Conceded',value:'34',sub:'-8% vs last season',good:true},
-            {label:'Clean Sheets',value:'18',sub:'Best in La Liga',good:true},
+            {label:'Clean Sheets',value:'18',sub:'Best in World Cup',good:true},
             {label:'Win Rate',value:'76%',sub:'33W 5D 6L',good:true},
           ].map(s=> (
             <div key={s.label} className="bg-rm-card rounded-2xl p-4">
@@ -802,7 +801,7 @@ function Community(){
           <div className="flex items-center justify-between mb-4">
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-rm-blue flex items-center justify-center mx-auto mb-1"><span className="text-white font-bold text-sm">RM</span></div>
-              <span className="text-white text-xs">Real Madrid</span>
+              <span className="text-white text-xs">France National Team</span>
             </div>
             <div className="text-center px-4">
               <p className="text-rm-muted text-xs">vs</p>
@@ -874,7 +873,7 @@ function Community(){
             <h3 className="text-white text-lg font-bold mb-4">Predict the Score</h3>
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
-                <p className="text-white font-semibold mb-2">Real Madrid</p>
+                <p className="text-white font-semibold mb-2">France National Team</p>
                 <input type="number" min="0" max="10" value={predHome} onChange={e=>setPredHome(e.target.value)} className="w-16 h-16 bg-rm-surface rounded-2xl text-white text-3xl font-bold text-center font-mono border border-rm-border focus:border-rm-blue outline-none" placeholder="0"/>
               </div>
               <span className="text-rm-muted text-xl font-bold px-4">-</span>
@@ -980,7 +979,7 @@ function InstallPrompt(){
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white text-sm font-semibold">Add to Home Screen</p>
-          <p className="text-rm-muted text-xs">Install RM Stats for the best experience</p>
+          <p className="text-rm-muted text-xs">Install FR Stats for the best experience</p>
         </div>
         <button onClick={()=>{setShow(false);Storage.set('installDismissed',true);setDismissed(true);}} className="text-rm-muted hover:text-white transition-colors">
           <Icon name="x" size={18}/>
