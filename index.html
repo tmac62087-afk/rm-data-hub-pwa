@@ -235,11 +235,11 @@ const matchesData = [
 ];
 
 const newsData = [
-  { id:1, title:'Mbappe named France captain for World Cup 2026', time:'2h ago', tag:'National Team', icon:'trophy' },
-  { id:2, title:'France unveils 26-man World Cup squad', time:'5h ago', tag:'Squad', icon:'flame' },
-  { id:3, title:'Griezmann: "This is my final World Cup"', time:'1d ago', tag:'Interview', icon:'star' },
-  { id:4, title:'Training camp opens in Clairefontaine', time:'2d ago', tag:'Training', icon:'target' },
-  { id:5, title:'Tactical analysis: France\'s 4-2-3-1 shape', time:'3d ago', tag:'Tactics', icon:'heart' },
+  { id:1, title:'Mbappe named France captain for World Cup 2026', excerpt:'Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title. The 27-year-old forward has been in scintillating form, scoring 38 goals in 42 appearances this season.', time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+  { id:2, title:'France unveils 26-man World Cup squad', excerpt:'Deschamps includes surprise call-ups as Les Bleus aim for glory in North America. The squad features a blend of experienced veterans and exciting young talents.', time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+  { id:3, title:'Griezmann: "This is my final World Cup"', excerpt:'The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage. Griezmann has been a cornerstone of the French national team for over a decade.', time:'1d ago', tag:'Interview', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+  { id:4, title:'Training camp opens in Clairefontaine', excerpt:'Les Bleus begin intensive preparations ahead of departure to the United States. The squad will undergo two weeks of high-altitude training before the tournament opener.', time:'2d ago', tag:'Training', icon:'target', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600' },
+  { id:5, title:'Tactical analysis: France's 4-2-3-1 shape', excerpt:'How Deschamps plans to balance attack and defence with a star-studded lineup. The system relies on Kante and Tchouameni as a double pivot, with Griezmann pulling the strings.', time:'3d ago', tag:'Tactics', icon:'heart', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=600' },
 ];
 
 const topicsData = [
@@ -302,6 +302,7 @@ function CountryFlag({code}){
 // ==================== MATCH CENTER ====================
 function MatchCenter({t,lang}){
   const [activeMatch,setActiveMatch]=useState(0);
+  const [selectedNews,setSelectedNews]=useState(null);
   const match=matchesData[activeMatch];
 
   return (
@@ -423,7 +424,7 @@ function MatchCenter({t,lang}){
         <h2 className="text-white font-semibold mb-3">Latest News</h2>
         <div className="space-y-3">
           {newsData.map(news=> (
-            <div key={news.id} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
+            <div key={news.id} onClick={()=>setSelectedNews(news)} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-rm-blue/15 flex items-center justify-center flex-shrink-0">
                 <Icon name={news.icon} size={18} className="text-rm-blue"/>
               </div>
