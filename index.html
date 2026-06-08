@@ -60,6 +60,139 @@ const Storage = {
   set: (k, v) => { try { localStorage.setItem('rm_'+k, JSON.stringify(v)); } catch(e){} },
 };
 
+
+// ==================== I18N ====================
+const translations = {
+  zh: {
+    matchCenter: '比赛中心',
+    squad: '阵容',
+    tactics: '战术',
+    data: '数据',
+    community: '社区',
+    season: '世界杯 2026',
+    playersCount: '名球员',
+    goalkeepers: '门将',
+    defenders: '后卫',
+    midfielders: '中场',
+    forwards: '前锋',
+    overview: '概览',
+    stats: '统计',
+    career: '生涯',
+    all: '全部',
+    upcoming: '即将开始',
+    finished: '已结束',
+    kickoffIn: '开球倒计时',
+    motm: '最佳球员',
+    possession: '控球率',
+    shots: '射门',
+    sot: '射正',
+    corners: '角球',
+    fouls: '犯规',
+    cleanSheets: '零封',
+    winRate: '胜率',
+    goalsScored: '进球数',
+    goalsConceded: '失球数',
+    rankings: '排行榜',
+    topScorers: '射手榜',
+    topAssists: '助攻榜',
+    minutes: '出场时间',
+    appearances: '出场次数',
+    saves: '扑救',
+    predictScore: '预测比分',
+    vs: '对阵',
+    hotTopics: '热门话题',
+    votes: '投票',
+    poll: '球迷投票',
+    addToHome: '添加到主屏幕',
+    installDesc: '安装 FR Stats 获得最佳体验',
+    settings: '设置',
+    language: '语言',
+    chinese: '中文',
+    english: 'English',
+    cancel: '取消',
+    save: '保存',
+    close: '关闭',
+    loadMore: '加载更多',
+    noEvents: '暂无赛事',
+    latestNews: '最新资讯',
+    worldCup: '世界杯',
+    groupStage: '小组赛',
+    knockout: '淘汰赛',
+  },
+  en: {
+    matchCenter: 'Match Center',
+    squad: 'Squad',
+    tactics: 'Tactics',
+    data: 'Data',
+    community: 'Community',
+    season: 'World Cup 2026',
+    playersCount: 'Players',
+    goalkeepers: 'Goalkeepers',
+    defenders: 'Defenders',
+    midfielders: 'Midfielders',
+    forwards: 'Forwards',
+    overview: 'Overview',
+    stats: 'Stats',
+    career: 'Career',
+    all: 'All',
+    upcoming: 'Upcoming',
+    finished: 'Finished',
+    kickoffIn: 'Kickoff in',
+    motm: 'MOTM',
+    possession: 'Possession',
+    shots: 'Shots',
+    sot: 'Shots on Target',
+    corners: 'Corners',
+    fouls: 'Fouls',
+    cleanSheets: 'Clean Sheets',
+    winRate: 'Win Rate',
+    goalsScored: 'Goals Scored',
+    goalsConceded: 'Goals Conceded',
+    rankings: 'Rankings',
+    topScorers: 'Top Scorers',
+    topAssists: 'Top Assists',
+    minutes: 'Minutes',
+    appearances: 'Appearances',
+    saves: 'Saves',
+    predictScore: 'Predict the Score',
+    vs: 'vs',
+    hotTopics: 'Hot Topics',
+    votes: 'Votes',
+    poll: 'Fan Poll',
+    addToHome: 'Add to Home Screen',
+    installDesc: 'Install FR Stats for the best experience',
+    settings: 'Settings',
+    language: 'Language',
+    chinese: '中文',
+    english: 'English',
+    cancel: 'Cancel',
+    save: 'Save',
+    close: 'Close',
+    loadMore: 'Load More',
+    noEvents: 'No Events',
+    latestNews: 'Latest News',
+    worldCup: 'World Cup',
+    groupStage: 'Group Stage',
+    knockout: 'Knockout',
+  }
+};
+
+function useLanguage() {
+  const [lang, setLang] = React.useState(() => {
+    try { return localStorage.getItem('fr_lang') || 'zh'; } catch(e) { return 'zh'; }
+  });
+  const t = React.useCallback((key) => {
+    return translations[lang]?.[key] || translations.en[key] || key;
+  }, [lang]);
+  const setLanguage = React.useCallback((l) => {
+    setLang(l);
+    try { localStorage.setItem('fr_lang', l); } catch(e) {}
+  }, []);
+  return { lang, t, setLanguage };
+}
+
+const posMap = { zh: { GK:'门将', CB:'中后卫', RB:'右后卫', LB:'左后卫', CM:'中场', DM:'后腰', AM:'前腰', ST:'前锋', LW:'左边锋', RW:'右边锋' }, en: { GK:'GK', CB:'CB', RB:'RB', LB:'LB', CM:'CM', DM:'DM', AM:'AM', ST:'ST', LW:'LW', RW:'RW' } };
+
 // ==================== DATA ====================
 const playersData = {
   goalkeepers: [
@@ -167,7 +300,7 @@ function CountryFlag({code}){
 }
 
 // ==================== MATCH CENTER ====================
-function MatchCenter(){
+function MatchCenter({t,lang}){
   const [activeMatch,setActiveMatch]=useState(0);
   const match=matchesData[activeMatch];
 
@@ -176,8 +309,8 @@ function MatchCenter(){
       <div className="px-5 pt-14 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-white text-2xl font-bold">Match Center</h1>
-            <p className="text-rm-muted text-sm mt-0.5">World Cup 2026</p>
+            <h1 className="text-white text-2xl font-bold">{t('matchCenter')}</h1>
+            <p className="text-rm-muted text-sm mt-0.5">{t('season')}</p>
           </div>
           <div className="flex gap-2">
             <button className="w-10 h-10 rounded-full bg-rm-card flex items-center justify-center text-white hover:bg-rm-border transition-colors">
@@ -238,13 +371,13 @@ function MatchCenter(){
             {match.status==='FT' && (
               <div className="bg-rm-surface rounded-xl p-3 flex items-center gap-3">
                 <Icon name="trophy" size={16} className="text-rm-gold flex-shrink-0"/>
-                <span className="text-white text-sm">MOTM: <span className="text-rm-gold font-semibold">{match.motm}</span></span>
+                <span className="text-white text-sm">{t('motm')}: <span className="text-rm-gold font-semibold">{match.motm}</span></span>
               </div>
             )}
             {match.status==='UPCOMING' && (
               <div className="bg-rm-surface rounded-xl p-3 flex items-center gap-3">
                 <Icon name="clock" size={16} className="text-rm-blue flex-shrink-0"/>
-                <span className="text-white text-sm">Kickoff in <span className="text-rm-gold font-semibold">7 days</span></span>
+                <span className="text-white text-sm">{t('kickoffIn')} <span className="text-rm-gold font-semibold">7 days</span></span>
               </div>
             )}
           </div>
@@ -326,8 +459,8 @@ function Squad({onPlayerSelect}){
   return (
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
-        <h1 className="text-white text-2xl font-bold">Squad</h1>
-        <p className="text-rm-muted text-sm mt-0.5">World Cup 2026 · {allPlayers.length} Players</p>
+        <h1 className="text-white text-2xl font-bold">{t('squad')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">{t('season')} · {allPlayers.length} {t('playersCount')}</p>
       </div>
 
       <div className="px-5 mb-4">
@@ -369,7 +502,7 @@ function Squad({onPlayerSelect}){
 // ==================== PLAYER DETAIL ====================
 function PlayerDetail({player,onBack}){
   const [activeTab,setActiveTab]=useState('overview');
-  const tabs={overview:'Overview',stats:'Stats',career:'Career'};
+  const tabs={overview:t('overview'),stats:t('stats'),career:t('career')};
 
   const statCats=[
     {label:'World Cup',matches:Math.floor(player.matches*0.7),goals:Math.floor(player.goals*0.6),assists:Math.floor(player.assists*0.7),minutes:Math.floor(player.minutes*0.7),saves:Math.floor((player.saves||0)*0.65)},
@@ -547,7 +680,7 @@ function PlayerDetail({player,onBack}){
 }
 
 // ==================== TACTICS ====================
-function Tactics(){
+function Tactics({t,lang}){
   const [formation,setFormation]=useState('433');
   const formations={
     '433':[
@@ -594,7 +727,7 @@ function Tactics(){
   return (
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
-        <h1 className="text-white text-2xl font-bold">Tactics</h1>
+        <h1 className="text-white text-2xl font-bold">{t('tactics')}</h1>
         <p className="text-rm-muted text-sm mt-0.5">Formation & Analysis</p>
       </div>
 
@@ -689,8 +822,8 @@ function Data(){
   return (
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
-        <h1 className="text-white text-2xl font-bold">Data</h1>
-        <p className="text-rm-muted text-sm mt-0.5">World Cup 2026 Rankings</p>
+        <h1 className="text-white text-2xl font-bold">{t('data')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">{t('season')} {t('rankings')}</p>
       </div>
 
       <div className="px-5 mb-4">
@@ -732,10 +865,10 @@ function Data(){
         <h2 className="text-white font-semibold mb-3">Team Overview</h2>
         <div className="grid grid-cols-2 gap-3">
           {[
-            {label:'Goals Scored',value:'112',sub:'+18% vs last season',good:true},
-            {label:'Goals Conceded',value:'34',sub:'-8% vs last season',good:true},
-            {label:'Clean Sheets',value:'18',sub:'Best in World Cup',good:true},
-            {label:'Win Rate',value:'76%',sub:'33W 5D 6L',good:true},
+            {label:t('goalsScored'),value:'112',sub:'+18% vs last season',good:true},
+            {label:t('goalsConceded'),value:'34',sub:'-8% vs last season',good:true},
+            {label:t('cleanSheets'),value:'18',sub:'Best in World Cup',good:true},
+            {label:t('winRate'),value:'76%',sub:'33W 5D 6L',good:true},
           ].map(s=> (
             <div key={s.label} className="bg-rm-card rounded-2xl p-4">
               <p className="text-rm-muted text-xs">{s.label}</p>
@@ -788,7 +921,7 @@ function Community(){
   return (
     <div className="pb-28 fade-in">
       <div className="px-5 pt-14 pb-4">
-        <h1 className="text-white text-2xl font-bold">Community</h1>
+        <h1 className="text-white text-2xl font-bold">{t('community')}</h1>
         <p className="text-rm-muted text-sm mt-0.5">Join the conversation</p>
       </div>
 
@@ -870,10 +1003,10 @@ function Community(){
           <div className="absolute inset-0 bg-black/70"></div>
           <div className="relative w-full max-w-[430px] bg-rm-card rounded-t-3xl p-6 slide-up" onClick={e=>e.stopPropagation()}>
             <div className="w-12 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
-            <h3 className="text-white text-lg font-bold mb-4">Predict the Score</h3>
+            <h3 className="text-white text-lg font-bold mb-4">{t('predictScore')}</h3>
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
-                <p className="text-white font-semibold mb-2">France National Team</p>
+                <p className="text-white font-semibold mb-2">France</p>
                 <input type="number" min="0" max="10" value={predHome} onChange={e=>setPredHome(e.target.value)} className="w-16 h-16 bg-rm-surface rounded-2xl text-white text-3xl font-bold text-center font-mono border border-rm-border focus:border-rm-blue outline-none" placeholder="0"/>
               </div>
               <span className="text-rm-muted text-xl font-bold px-4">-</span>
@@ -894,28 +1027,34 @@ function Community(){
 function App(){
   const [activeTab,setActiveTab]=useState('match');
   const [selectedPlayer,setSelectedPlayer]=useState(null);
+  const {lang,t,setLanguage}=useLanguage();
 
   const tabs=[
-    {id:'match',label:'Matches',icon:'home'},
-    {id:'squad',label:'Squad',icon:'users'},
-    {id:'tactics',label:'Tactics',icon:'layout'},
-    {id:'data',label:'Data',icon:'barChart'},
-    {id:'community',label:'Community',icon:'messageCircle'},
+    {id:'match',label:t('matchCenter'),icon:'home'},
+    {id:'squad',label:t('squad'),icon:'users'},
+    {id:'tactics',label:t('tactics'),icon:'layout'},
+    {id:'data',label:t('data'),icon:'barChart'},
+    {id:'community',label:t('community'),icon:'messageCircle'},
   ];
 
   return (
     <div className="w-full max-w-[430px] min-h-screen bg-rm-dark relative overflow-hidden">
       {/* Install prompt for PWA */}
-      <InstallPrompt/>
+      <InstallPrompt t={t}/>
 
       {/* Status bar */}
       <div className="sticky top-0 z-50">
         <div className="h-12 flex items-center justify-between px-6 bg-rm-dark/90 backdrop-blur-xl">
           <span className="text-white text-sm font-semibold">9:41</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-white/20"></div>
-            <div className="w-4 h-4 rounded-full bg-white/20"></div>
-            <div className="w-6 h-3 rounded-sm bg-white/40"></div>
+          <div className="flex items-center gap-3">
+            <button onClick={()=>setLanguage(lang==='zh'?'en':'zh')} className="text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+              {lang==='zh'?'EN':'中文'}
+            </button>
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full bg-white/20"></div>
+              <div className="w-4 h-4 rounded-full bg-white/20"></div>
+              <div className="w-6 h-3 rounded-sm bg-white/40"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -923,14 +1062,14 @@ function App(){
       {/* Content */}
       <div className="relative">
         {selectedPlayer?(
-          <PlayerDetail player={selectedPlayer} onBack={()=>setSelectedPlayer(null)}/>
+          <PlayerDetail t={t} lang={lang} player={selectedPlayer} onBack={()=>setSelectedPlayer(null)}/>
         ):(
           <>
-            {activeTab==='match'&&<MatchCenter/>}
-            {activeTab==='squad'&&<Squad onPlayerSelect={setSelectedPlayer}/>}
-            {activeTab==='tactics'&&<Tactics/>}
-            {activeTab==='data'&&<Data/>}
-            {activeTab==='community'&&<Community/>}
+            {activeTab==='match'&&<MatchCenter t={t} lang={lang}/>}
+            {activeTab==='squad'&&<Squad t={t} lang={lang} onPlayerSelect={setSelectedPlayer}/>}
+            {activeTab==='tactics'&&<Tactics t={t} lang={lang}/>}
+            {activeTab==='data'&&<Data t={t} lang={lang}/>}
+            {activeTab==='community'&&<Community t={t} lang={lang}/>}
           </>
         )}
       </div>
@@ -957,7 +1096,7 @@ function App(){
   );
 }
 
-function InstallPrompt(){
+function InstallPrompt({t}){
   const [show,setShow]=useState(false);
   const [dismissed,setDismissed]=useState(Storage.get('installDismissed',false));
 
@@ -978,8 +1117,8 @@ function InstallPrompt(){
           <span className="text-white font-black text-sm">RM</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-white text-sm font-semibold">Add to Home Screen</p>
-          <p className="text-rm-muted text-xs">Install FR Stats for the best experience</p>
+          <p className="text-white text-sm font-semibold">{t('addToHome')}</p>
+          <p className="text-rm-muted text-xs">{t('installDesc')}</p>
         </div>
         <button onClick={()=>{setShow(false);Storage.set('installDismissed',true);setDismissed(true);}} className="text-rm-muted hover:text-white transition-colors">
           <Icon name="x" size={18}/>
