@@ -443,7 +443,7 @@ function MatchCenter({t,lang}){
 }
 
 // ==================== SQUAD ====================
-function Squad({onPlayerSelect}){
+function Squad({t,lang,onPlayerSelect}){
   const [selectedPos,setSelectedPos]=useState('ALL');
   const positions={'ALL':'All','GK':'Goalkeepers','DEF':'Defenders','MID':'Midfielders','FWD':'Forwards'};
 
@@ -500,7 +500,7 @@ function Squad({onPlayerSelect}){
 }
 
 // ==================== PLAYER DETAIL ====================
-function PlayerDetail({player,onBack}){
+function PlayerDetail({t,lang,player,onBack}){
   const [activeTab,setActiveTab]=useState('overview');
   const tabs={overview:t('overview'),stats:t('stats'),career:t('career')};
 
@@ -802,7 +802,7 @@ function Tactics({t,lang}){
 }
 
 // ==================== DATA ====================
-function Data(){
+function Data({t,lang}){
   const [activeRank,setActiveRank]=useState('goals');
   const ranks={
     goals:{label:'Goals',key:'goals',icon:'target'},
@@ -883,7 +883,7 @@ function Data(){
 }
 
 // ==================== COMMUNITY ====================
-function Community(){
+function Community({t,lang}){
   const [prediction,setPrediction]=useState(Storage.get('prediction',null));
   const [vote,setVote]=useState(Storage.get('vote',null));
   const [likedTopics,setLikedTopics]=useState(Storage.get('likedTopics',[]));
