@@ -235,11 +235,11 @@ const matchesData = [
 ];
 
 const newsData = [
-  { id:1, title:'Mbappe named France captain for World Cup 2026', time:'2h ago', tag:'National Team', icon:'trophy' },
-  { id:2, title:'France unveils 26-man World Cup squad', time:'5h ago', tag:'Squad', icon:'flame' },
-  { id:3, title:'Griezmann: "This is my final World Cup"', time:'1d ago', tag:'Interview', icon:'star' },
-  { id:4, title:'Training camp opens in Clairefontaine', time:'2d ago', tag:'Training', icon:'target' },
-  { id:5, title:'Tactical analysis: France\'s 4-2-3-1 shape', time:'3d ago', tag:'Tactics', icon:'heart' },
+  { id:1, title:`Mbappe named France captain for World Cup 2026`, excerpt:`Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title.`, time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+  { id:2, title:`France unveils 26-man World Cup squad`, excerpt:`Deschamps includes surprise call-ups as Les Bleus aim for glory in North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+  { id:3, title:`Griezmann: "This is my final World Cup"`, excerpt:`The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage.`, time:'1d ago', tag:'Interview', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+  { id:4, title:`Training camp opens in Clairefontaine`, excerpt:`Les Bleus begin intensive preparations ahead of departure to the United States.`, time:'2d ago', tag:'Training', icon:'target', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600' },
+  { id:5, title:`Tactical analysis: France's 4-2-3-1 shape`, excerpt:`How Deschamps plans to balance attack and defence with a star-studded lineup.`, time:'3d ago', tag:'Tactics', icon:'heart', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=600' },
 ];
 
 const topicsData = [
@@ -302,6 +302,7 @@ function CountryFlag({code}){
 // ==================== MATCH CENTER ====================
 function MatchCenter({t,lang}){
   const [activeMatch,setActiveMatch]=useState(0);
+  const [selectedNews,setSelectedNews]=useState(null);
   const match=matchesData[activeMatch];
 
   return (
@@ -423,7 +424,7 @@ function MatchCenter({t,lang}){
         <h2 className="text-white font-semibold mb-3">Latest News</h2>
         <div className="space-y-3">
           {newsData.map(news=> (
-            <div key={news.id} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
+            <div key={news.id} onClick={()=>setSelectedNews(news)} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-rm-blue/15 flex items-center justify-center flex-shrink-0">
                 <Icon name={news.icon} size={18} className="text-rm-blue"/>
               </div>
@@ -438,6 +439,34 @@ function MatchCenter({t,lang}){
           ))}
         </div>
       </div>
+
+      {/* News Detail Modal */}
+      {selectedNews&&(
+        <div className="fixed inset-0 z-[60] flex items-end justify-center" onClick={()=>setSelectedNews(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={()=>setSelectedNews(null)}></div>
+          <div className="relative w-full max-w-[430px] bg-rm-card rounded-t-3xl max-h-[85vh] overflow-y-auto scrollbar-hide slide-up" onClick={e=>e.stopPropagation()}>
+            <div className="sticky top-0 bg-rm-card/95 backdrop-blur-xl z-10 px-5 pt-4 pb-3 border-b border-white/5 flex items-center justify-between">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-rm-gold/15 text-rm-gold font-medium">{selectedNews.tag}</span>
+              <button onClick={()=>setSelectedNews(null)} className="w-8 h-8 rounded-full bg-rm-surface flex items-center justify-center text-rm-muted hover:text-white">
+                <Icon name="x" size={16}/>
+              </button>
+            </div>
+            <div className="px-5 py-4">
+              {selectedNews.image&&(
+                <div className="w-full h-48 rounded-2xl overflow-hidden mb-4">
+                  <img src={selectedNews.image} alt={selectedNews.title} className="w-full h-full object-cover" onError={e=>e.target.style.display='none'}/>
+                </div>
+              )}
+              <h2 className="text-white text-xl font-bold leading-snug mb-3">{selectedNews.title}</h2>
+              <p className="text-rm-muted text-sm leading-relaxed mb-4">{selectedNews.excerpt}</p>
+              <div className="flex items-center gap-2 text-xs text-rm-muted">
+                <Icon name="clock" size={12}/>
+                <span>{selectedNews.time}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
