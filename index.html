@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="FR Stats">
 <meta name="theme-color" content="#0A0A0F">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23002395' rx='36'/%3E%3Ctext x='90' y='108' font-family='system-ui' font-size='68' font-weight='900' fill='white' text-anchor='middle'%3EFR%3C/text%3E%3C/svg%3E">
-<title>France World Cup Stats</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230A0A0F' rx='36'/%3E%3Ctext x='90' y='112' font-family='system-ui' font-size='64' font-weight='900' fill='white' text-anchor='middle'%3EWC%3C/text%3E%3C/svg%3E">
+<title>World Cup 2026 Stats</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -21,7 +21,7 @@ tailwind.config = {
     extend: {
       fontFamily: { sans: ['Inter','system-ui'], mono: ['JetBrains Mono','monospace'] },
       colors: {
-        rm: { blue:'#002395', gold:'#ED2939', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' }
+        rm: team.colors
       }
     }
   }
@@ -194,61 +194,478 @@ function useLanguage() {
 const posMap = { zh: { GK:'门将', CB:'中后卫', RB:'右后卫', LB:'左后卫', CM:'中场', DM:'后腰', AM:'前腰', ST:'前锋', LW:'左边锋', RW:'右边锋' }, en: { GK:'GK', CB:'CB', RB:'RB', LB:'LB', CM:'CM', DM:'DM', AM:'AM', ST:'ST', LW:'LW', RW:'RW' } };
 
 // ==================== DATA ====================
-const playersData = {
-  goalkeepers: [
-    { id:'maignan', name:'Mike Maignan', short:'Maignan', number:16, pos:'GK', country:'FR', age:30, matches:28, goals:0, assists:0, minutes:2520, saves:87, cleanSheets:14, passAcc:74 },
-    { id:'areola', name:'Alphonse Areola', short:'Areola', number:23, pos:'GK', country:'FR', age:32, matches:6, goals:0, assists:0, minutes:540, saves:18, cleanSheets:3, passAcc:70 },
-  ],
-  defenders: [
-    { id:'kounde', name:'Jules Kounde', short:'Kounde', number:5, pos:'RB', country:'FR', age:26, matches:38, goals:2, assists:5, minutes:3240, tackles:48, interceptions:32, duelsWon:65, passAcc:88 },
-    { id:'upamecano', name:'Dayot Upamecano', short:'Upamecano', number:2, pos:'CB', country:'FR', age:26, matches:32, goals:1, assists:1, minutes:2743, tackles:42, interceptions:38, duelsWon:70, passAcc:87 },
-    { id:'konate', name:'Ibrahima Konate', short:'Konate', number:24, pos:'CB', country:'FR', age:25, matches:28, goals:0, assists:0, minutes:2240, tackles:38, interceptions:30, duelsWon:72, passAcc:86 },
-    { id:'theo', name:'Theo Hernandez', short:'Theo H.', number:22, pos:'LB', country:'FR', age:28, matches:36, goals:4, assists:7, minutes:3100, tackles:44, interceptions:28, duelsWon:68, passAcc:84 },
-    { id:'pavard', name:'Benjamin Pavard', short:'Pavard', number:21, pos:'CB', country:'FR', age:29, matches:26, goals:2, assists:2, minutes:2080, tackles:34, interceptions:26, duelsWon:64, passAcc:89 },
-    { id:'clauss', name:'Jonathan Clauss', short:'Clauss', number:15, pos:'RB', country:'FR', age:32, matches:20, goals:1, assists:4, minutes:1600, tackles:30, interceptions:22, duelsWon:58, passAcc:82 },
-    { id:'digne', name:'Lucas Digne', short:'Digne', number:18, pos:'LB', country:'FR', age:31, matches:14, goals:0, assists:3, minutes:1120, tackles:24, interceptions:20, duelsWon:60, passAcc:83 },
-  ],
-  midfielders: [
-    { id:'tchouameni', name:'Aurelien Tchouameni', short:'Tchouameni', number:8, pos:'DM', country:'FR', age:25, matches:36, goals:2, assists:3, minutes:3020, tackles:68, interceptions:48, duelsWon:66, passAcc:89, keyPasses:28 },
-    { id:'camavinga', name:'Eduardo Camavinga', short:'Camavinga', number:6, pos:'CM', country:'FR', age:22, matches:34, goals:2, assists:4, minutes:2450, tackles:62, interceptions:35, duelsWon:68, passAcc:88, keyPasses:30 },
-    { id:'rabiot', name:'Adrien Rabiot', short:'Rabiot', number:14, pos:'CM', country:'FR', age:30, matches:32, goals:5, assists:3, minutes:2560, tackles:50, interceptions:32, duelsWon:64, passAcc:87, keyPasses:26 },
-    { id:'griezmann', name:'Antoine Griezmann', short:'Griezmann', number:7, pos:'AM', country:'FR', age:35, matches:38, goals:12, assists:14, minutes:3240, tackles:42, interceptions:28, duelsWon:60, passAcc:85, keyPasses:56 },
-    { id:'kante', name:'N\'Golo Kante', short:'Kante', number:13, pos:'DM', country:'FR', age:34, matches:28, goals:1, assists:2, minutes:2100, tackles:58, interceptions:42, duelsWon:62, passAcc:86, keyPasses:18 },
-    { id:'yfofana', name:'Youssouf Fofana', short:'Y.Fofana', number:19, pos:'CM', country:'FR', age:25, matches:20, goals:1, assists:2, minutes:1400, tackles:32, interceptions:22, duelsWon:60, passAcc:84, keyPasses:20 },
-  ],
-  forwards: [
-    { id:'mbappe', name:'Kylian Mbappe', short:'Mbappe', number:10, pos:'ST', country:'FR', age:27, matches:42, goals:38, assists:8, minutes:3650, tackles:14, interceptions:10, duelsWon:50, passAcc:80, keyPasses:42 },
-    { id:'dembele', name:'Ousmane Dembele', short:'Dembele', number:11, pos:'RW', country:'FR', age:28, matches:36, goals:16, assists:12, minutes:2900, tackles:22, interceptions:14, duelsWon:58, passAcc:82, keyPasses:48 },
-    { id:'kolomuani', name:'Randal Kolo Muani', short:'Kolo Muani', number:12, pos:'ST', country:'FR', age:26, matches:28, goals:10, assists:4, minutes:1960, tackles:18, interceptions:12, duelsWon:56, passAcc:78, keyPasses:24 },
-    { id:'barcola', name:'Bradley Barcola', short:'Barcola', number:20, pos:'LW', country:'FR', age:22, matches:22, goals:8, assists:6, minutes:1540, tackles:16, interceptions:10, duelsWon:54, passAcc:81, keyPasses:32 },
-    { id:'mthuram', name:'Marcus Thuram', short:'Thuram', number:15, pos:'ST', country:'FR', age:28, matches:30, goals:12, assists:5, minutes:2340, tackles:20, interceptions:14, duelsWon:58, passAcc:79, keyPasses:30 },
-    { id:'olise', name:'Michael Olise', short:'Olise', number:25, pos:'RW', country:'FR', age:23, matches:16, goals:4, assists:5, minutes:1080, tackles:12, interceptions:8, duelsWon:52, passAcc:83, keyPasses:28 },
-  ],
+// ==================== TEAMS DATA ====================
+const teamsData = {
+  france: {
+    name: 'France', nameZh: '法国',
+    colors: { blue:'#002395', gold:'#ED2939', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇫🇷',
+    playersData: {
+      goalkeepers: [
+        { id:'maignan', name:'Mike Maignan', short:'Maignan', number:16, pos:'GK', country:'FR', age:30, matches:28, goals:0, assists:0, minutes:2520, saves:87, cleanSheets:14, passAcc:74 },
+        { id:'areola', name:'Alphonse Areola', short:'Areola', number:23, pos:'GK', country:'FR', age:32, matches:6, goals:0, assists:0, minutes:540, saves:18, cleanSheets:3, passAcc:70 },
+      ],
+      defenders: [
+        { id:'kounde', name:'Jules Kounde', short:'Kounde', number:5, pos:'RB', country:'FR', age:26, matches:38, goals:2, assists:5, minutes:3240, tackles:48, interceptions:32, duelsWon:65, passAcc:88 },
+        { id:'upamecano', name:'Dayot Upamecano', short:'Upamecano', number:2, pos:'CB', country:'FR', age:26, matches:32, goals:1, assists:1, minutes:2743, tackles:42, interceptions:38, duelsWon:70, passAcc:87 },
+        { id:'konate', name:'Ibrahima Konate', short:'Konate', number:24, pos:'CB', country:'FR', age:25, matches:28, goals:0, assists:0, minutes:2240, tackles:38, interceptions:30, duelsWon:72, passAcc:86 },
+        { id:'theo', name:'Theo Hernandez', short:'Theo H.', number:22, pos:'LB', country:'FR', age:28, matches:36, goals:4, assists:7, minutes:3100, tackles:44, interceptions:28, duelsWon:68, passAcc:84 },
+        { id:'pavard', name:'Benjamin Pavard', short:'Pavard', number:21, pos:'CB', country:'FR', age:29, matches:26, goals:2, assists:2, minutes:2080, tackles:34, interceptions:26, duelsWon:64, passAcc:89 },
+        { id:'clauss', name:'Jonathan Clauss', short:'Clauss', number:15, pos:'RB', country:'FR', age:32, matches:20, goals:1, assists:4, minutes:1600, tackles:30, interceptions:22, duelsWon:58, passAcc:82 },
+        { id:'digne', name:'Lucas Digne', short:'Digne', number:18, pos:'LB', country:'FR', age:31, matches:14, goals:0, assists:3, minutes:1120, tackles:24, interceptions:20, duelsWon:60, passAcc:83 },
+      ],
+      midfielders: [
+        { id:'tchouameni', name:'Aurelien Tchouameni', short:'Tchouameni', number:8, pos:'DM', country:'FR', age:25, matches:36, goals:2, assists:3, minutes:3020, tackles:68, interceptions:48, duelsWon:66, passAcc:89, keyPasses:28 },
+        { id:'camavinga', name:'Eduardo Camavinga', short:'Camavinga', number:6, pos:'CM', country:'FR', age:22, matches:34, goals:2, assists:4, minutes:2450, tackles:62, interceptions:35, duelsWon:68, passAcc:88, keyPasses:30 },
+        { id:'rabiot', name:'Adrien Rabiot', short:'Rabiot', number:14, pos:'CM', country:'FR', age:30, matches:32, goals:5, assists:3, minutes:2560, tackles:50, interceptions:32, duelsWon:64, passAcc:87, keyPasses:26 },
+        { id:'griezmann', name:'Antoine Griezmann', short:'Griezmann', number:7, pos:'AM', country:'FR', age:35, matches:38, goals:12, assists:14, minutes:3240, tackles:42, interceptions:28, duelsWon:60, passAcc:85, keyPasses:56 },
+        { id:'kante', name:`N'Golo Kante`, short:'Kante', number:13, pos:'DM', country:'FR', age:34, matches:28, goals:1, assists:2, minutes:2100, tackles:58, interceptions:42, duelsWon:62, passAcc:86, keyPasses:18 },
+        { id:'yfofana', name:'Youssouf Fofana', short:'Y.Fofana', number:19, pos:'CM', country:'FR', age:25, matches:20, goals:1, assists:2, minutes:1400, tackles:32, interceptions:22, duelsWon:60, passAcc:84, keyPasses:20 },
+      ],
+      forwards: [
+        { id:'mbappe', name:'Kylian Mbappe', short:'Mbappe', number:10, pos:'ST', country:'FR', age:27, matches:42, goals:38, assists:8, minutes:3650, tackles:14, interceptions:10, duelsWon:50, passAcc:80, keyPasses:42 },
+        { id:'dembele', name:'Ousmane Dembele', short:'Dembele', number:11, pos:'RW', country:'FR', age:28, matches:36, goals:16, assists:12, minutes:2900, tackles:22, interceptions:14, duelsWon:58, passAcc:82, keyPasses:48 },
+        { id:'kolomuani', name:'Randal Kolo Muani', short:'Kolo Muani', number:12, pos:'ST', country:'FR', age:26, matches:28, goals:10, assists:4, minutes:1960, tackles:18, interceptions:12, duelsWon:56, passAcc:78, keyPasses:24 },
+        { id:'barcola', name:'Bradley Barcola', short:'Barcola', number:20, pos:'LW', country:'FR', age:22, matches:22, goals:8, assists:6, minutes:1540, tackles:16, interceptions:10, duelsWon:54, passAcc:81, keyPasses:32 },
+        { id:'mthuram', name:'Marcus Thuram', short:'Thuram', number:15, pos:'ST', country:'FR', age:28, matches:30, goals:12, assists:5, minutes:2340, tackles:20, interceptions:14, duelsWon:58, passAcc:79, keyPasses:30 },
+        { id:'olise', name:'Michael Olise', short:'Olise', number:25, pos:'RW', country:'FR', age:23, matches:16, goals:4, assists:5, minutes:1080, tackles:12, interceptions:8, duelsWon:52, passAcc:83, keyPasses:28 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'France', away:'Canada', homeScore:null, awayScore:null, date:'2026-06-12', comp:'World Cup Group I', status:'UPCOMING', time:'20:00 EST' },
+      { id:2, home:'France', away:'Israel', homeScore:null, awayScore:null, date:'2026-06-18', comp:'World Cup Group I', status:'UPCOMING', time:'18:00 EST' },
+      { id:3, home:'France', away:'New Zealand', homeScore:null, awayScore:null, date:'2026-06-24', comp:'World Cup Group I', status:'UPCOMING', time:'15:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Mbappe named France captain for World Cup 2026`, excerpt:`Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title.`, time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`France unveils 26-man World Cup squad`, excerpt:`Deschamps includes surprise call-ups as Les Bleus aim for glory in North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Griezmann: "This is my final World Cup"`, excerpt:`The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage.`, time:'1d ago', tag:'Interview', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+      { id:4, title:`Training camp opens in Clairefontaine`, excerpt:`Les Bleus begin intensive preparations ahead of departure to the United States.`, time:'2d ago', tag:'Training', icon:'target', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600' },
+      { id:5, title:`Tactical analysis: France's 4-2-3-1 shape`, excerpt:`How Deschamps plans to balance attack and defence with a star-studded lineup.`, time:'3d ago', tag:'Tactics', icon:'heart', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'BleuFan_98', avatar:'B', title:'Will France win the 2026 World Cup?', replies:342, likes:890, time:'2h ago', hot:true },
+      { id:2, author:'FootballAnalyst', avatar:'F', title:'Mbappe vs Messi: Who scores more in the group stage?', replies:128, likes:456, time:'5h ago', hot:true },
+      { id:3, author:'Tactician_FR', avatar:'T', title:'Deschamps starting XI predictions', replies:89, likes:234, time:'8h ago', hot:false },
+      { id:4, author:'WorldCupDreamer', avatar:'W', title:'France vs Argentina final rematch?', replies:567, likes:1234, time:'1d ago', hot:true },
+      { id:5, author:'LesBleusHistory', avatar:'L', title:'Best French performance at a World Cup?', replies:45, likes:178, time:'2d ago', hot:false },
+    ],
+  },
+  brazil: {
+    name: 'Brazil', nameZh: '巴西',
+    colors: { blue:'#009739', gold:'#FEDD00', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇧🇷',
+    playersData: {
+      goalkeepers: [
+        { id:'alisson', name:'Alisson Becker', short:'Alisson', number:1, pos:'GK', country:'BR', age:33, matches:30, goals:0, assists:0, minutes:2700, saves:76, cleanSheets:12, passAcc:78 },
+        { id:'ederson', name:'Ederson Moraes', short:'Ederson', number:23, pos:'GK', country:'BR', age:32, matches:12, goals:0, assists:0, minutes:1080, saves:28, cleanSheets:6, passAcc:85 },
+      ],
+      defenders: [
+        { id:'marquinhos', name:'Marquinhos', short:'Marquinhos', number:4, pos:'CB', country:'BR', age:31, matches:36, goals:3, assists:1, minutes:3240, tackles:44, interceptions:36, duelsWon:68, passAcc:90 },
+        { id:'militao', name:'Eder Militao', short:'Militao', number:3, pos:'CB', country:'BR', age:28, matches:32, goals:2, assists:0, minutes:2720, tackles:38, interceptions:30, duelsWon:70, passAcc:88 },
+        { id:'gabriel', name:'Gabriel Magalhaes', short:'Gabriel', number:6, pos:'CB', country:'BR', age:27, matches:28, goals:2, assists:1, minutes:2380, tackles:40, interceptions:28, duelsWon:66, passAcc:85 },
+        { id:'danilo', name:'Danilo Luiz', short:'Danilo', number:2, pos:'RB', country:'BR', age:34, matches:26, goals:1, assists:3, minutes:2080, tackles:30, interceptions:24, duelsWon:60, passAcc:84 },
+        { id:'arana', name:'Guilherme Arana', short:'Arana', number:16, pos:'LB', country:'BR', age:28, matches:22, goals:1, assists:4, minutes:1760, tackles:32, interceptions:20, duelsWon:62, passAcc:82 },
+      ],
+      midfielders: [
+        { id:'bruno', name:'Bruno Guimaraes', short:'Bruno G.', number:5, pos:'CM', country:'BR', age:28, matches:34, goals:4, assists:6, minutes:2900, tackles:58, interceptions:38, duelsWon:64, passAcc:87, keyPasses:32 },
+        { id:'paqueta', name:'Lucas Paqueta', short:'Paqueta', number:7, pos:'AM', country:'BR', age:29, matches:30, goals:6, assists:8, minutes:2520, tackles:42, interceptions:26, duelsWon:58, passAcc:84, keyPasses:42 },
+        { id:'andrey', name:'Andrey Santos', short:'Andrey', number:15, pos:'DM', country:'BR', age:21, matches:24, goals:2, assists:2, minutes:1960, tackles:48, interceptions:32, duelsWon:62, passAcc:86, keyPasses:22 },
+        { id:'raphinha', name:'Raphinha', short:'Raphinha', number:11, pos:'RW', country:'BR', age:29, matches:32, goals:14, assists:10, minutes:2720, tackles:28, interceptions:18, duelsWon:56, passAcc:83, keyPasses:48 },
+      ],
+      forwards: [
+        { id:'vinijr', name:'Vinicius Jr.', short:'Vini Jr.', number:10, pos:'LW', country:'BR', age:26, matches:38, goals:22, assists:14, minutes:3340, tackles:22, interceptions:14, duelsWon:62, passAcc:82, keyPasses:56 },
+        { id:'rodrygo', name:'Rodrygo Goes', short:'Rodrygo', number:9, pos:'ST', country:'BR', age:25, matches:34, goals:16, assists:8, minutes:2720, tackles:18, interceptions:12, duelsWon:54, passAcc:84, keyPasses:38 },
+        { id:'savinho', name:'Savio Moreira', short:'Savinho', number:20, pos:'RW', country:'BR', age:21, matches:20, goals:6, assists:4, minutes:1400, tackles:14, interceptions:10, duelsWon:52, passAcc:80, keyPasses:28 },
+        { id:'endrick', name:'Endrick Felipe', short:'Endrick', number:25, pos:'ST', country:'BR', age:20, matches:16, goals:8, assists:2, minutes:980, tackles:10, interceptions:6, duelsWon:50, passAcc:78, keyPasses:18 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Brazil', away:'Senegal', homeScore:null, awayScore:null, date:'2026-06-13', comp:'World Cup Group G', status:'UPCOMING', time:'16:00 EST' },
+      { id:2, home:'Brazil', away:'Denmark', homeScore:null, awayScore:null, date:'2026-06-19', comp:'World Cup Group G', status:'UPCOMING', time:'19:00 EST' },
+      { id:3, home:'Brazil', away:'Japan', homeScore:null, awayScore:null, date:'2026-06-25', comp:'World Cup Group G', status:'UPCOMING', time:'15:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Vini Jr named Brazil captain for World Cup 2026`, excerpt:`Dorival Junior confirms Vinicius Junior will lead the Selecao in their pursuit of a sixth World Cup title.`, time:'3h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Brazil squad features 8 new faces`, excerpt:`Dorival Junior rewards in-form players with surprise call-ups for the tournament in North America.`, time:'6h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Neymar ruled out with injury`, excerpt:`The Al-Hilal forward fails to recover in time, ending his dream of a World Cup comeback.`, time:'1d ago', tag:'Injury', icon:'heart', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'Canarinho', avatar:'C', title:'Can Brazil win the Hexa in 2026?', replies:567, likes:1200, time:'1h ago', hot:true },
+      { id:2, author:'Selecaofan', avatar:'S', title:'Vini Jr vs Mbappe: who is the best winger?', replies:234, likes:678, time:'4h ago', hot:true },
+      { id:3, author:'TiteLegacy', avatar:'T', title:'Is Dorival the right man for the job?', replies:89, likes:312, time:'1d ago', hot:false },
+    ],
+  },
+  england: {
+    name: 'England', nameZh: '英格兰',
+    colors: { blue:'#CF081F', gold:'#FFFFFF', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    playersData: {
+      goalkeepers: [
+        { id:'pickford', name:'Jordan Pickford', short:'Pickford', number:1, pos:'GK', country:'GB', age:32, matches:32, goals:0, assists:0, minutes:2880, saves:82, cleanSheets:12, passAcc:72 },
+        { id:'ramsdale', name:'Aaron Ramsdale', short:'Ramsdale', number:22, pos:'GK', country:'GB', age:28, matches:8, goals:0, assists:0, minutes:720, saves:20, cleanSheets:3, passAcc:70 },
+      ],
+      defenders: [
+        { id:'walker', name:'Kyle Walker', short:'Walker', number:2, pos:'RB', country:'GB', age:36, matches:30, goals:0, assists:3, minutes:2520, tackles:38, interceptions:28, duelsWon:62, passAcc:84 },
+        { id:'stones', name:'John Stones', short:'Stones', number:5, pos:'CB', country:'GB', age:32, matches:28, goals:2, assists:1, minutes:2380, tackles:32, interceptions:26, duelsWon:66, passAcc:89 },
+        { id:'gomez', name:'Joe Gomez', short:'Gomez', number:6, pos:'CB', country:'GB', age:29, matches:24, goals:0, assists:0, minutes:1960, tackles:36, interceptions:24, duelsWon:64, passAcc:86 },
+        { id:'shaw', name:'Luke Shaw', short:'Shaw', number:3, pos:'LB', country:'GB', age:30, matches:22, goals:1, assists:4, minutes:1760, tackles:30, interceptions:20, duelsWon:60, passAcc:82 },
+        { id:'white', name:'Ben White', short:'White', number:15, pos:'RB', country:'GB', age:28, matches:18, goals:1, assists:2, minutes:1400, tackles:26, interceptions:18, duelsWon:58, passAcc:83 },
+      ],
+      midfielders: [
+        { id:'rice', name:'Declan Rice', short:'Rice', number:4, pos:'DM', country:'GB', age:27, matches:36, goals:3, assists:4, minutes:3160, tackles:62, interceptions:48, duelsWon:68, passAcc:88, keyPasses:24 },
+        { id:'bellingham', name:'Jude Bellingham', short:'Bellingham', number:10, pos:'CM', country:'GB', age:23, matches:38, goals:16, assists:10, minutes:3340, tackles:48, interceptions:30, duelsWon:66, passAcc:89, keyPasses:46 },
+        { id:'foden', name:'Phil Foden', short:'Foden', number:11, pos:'AM', country:'GB', age:26, matches:34, goals:12, assists:14, minutes:2900, tackles:28, interceptions:18, duelsWon:56, passAcc:86, keyPasses:52 },
+        { id:'palmer', name:'Cole Palmer', short:'Palmer', number:20, pos:'RW', country:'GB', age:24, matches:30, goals:14, assists:8, minutes:2380, tackles:22, interceptions:14, duelsWon:54, passAcc:84, keyPasses:38 },
+      ],
+      forwards: [
+        { id:'kane', name:'Harry Kane', short:'Kane', number:9, pos:'ST', country:'GB', age:33, matches:40, goals:34, assists:6, minutes:3480, tackles:14, interceptions:10, duelsWon:52, passAcc:79, keyPasses:32 },
+        { id:'saka', name:'Bukayo Saka', short:'Saka', number:7, pos:'LW', country:'GB', age:25, matches:36, goals:18, assists:12, minutes:3080, tackles:26, interceptions:16, duelsWon:60, passAcc:83, keyPasses:44 },
+        { id:'watkins', name:'Ollie Watkins', short:'Watkins', number:19, pos:'ST', country:'GB', age:30, matches:24, goals:10, assists:4, minutes:1680, tackles:18, interceptions:12, duelsWon:56, passAcc:80, keyPasses:22 },
+        { id:'madueke', name:'Noni Madueke', short:'Madueke', number:25, pos:'RW', country:'GB', age:24, matches:16, goals:6, assists:3, minutes:980, tackles:12, interceptions:8, duelsWon:50, passAcc:82, keyPasses:20 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'England', away:'USA', homeScore:null, awayScore:null, date:'2026-06-14', comp:'World Cup Group B', status:'UPCOMING', time:'17:00 EST' },
+      { id:2, home:'England', away:'Nigeria', homeScore:null, awayScore:null, date:'2026-06-20', comp:'World Cup Group B', status:'UPCOMING', time:'20:00 EST' },
+      { id:3, home:'England', away:'Serbia', homeScore:null, awayScore:null, date:'2026-06-26', comp:'World Cup Group B', status:'UPCOMING', time:'16:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Kane confident England can win the World Cup`, excerpt:`The Bayern Munich striker believes the Three Lions have the quality to finally end 60 years of hurt.`, time:'2h ago', tag:'Interview', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Southgate names 26-man squad`, excerpt:`The England manager includes several surprise names as he finalises his squad for North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Bellingham wins Golden Boy award`, excerpt:`The Real Madrid midfielder continues his remarkable rise with another individual accolade.`, time:'1d ago', tag:'Awards', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'ThreeLions', avatar:'T', title:`Is this finally England's year?`, replies:456, likes:1100, time:'2h ago', hot:true },
+      { id:2, author:'WembleyWay', avatar:'W', title:'Kane or Watkins: who starts up front?', replies:234, likes:567, time:'6h ago', hot:true },
+      { id:3, author:'ComeOnEngland', avatar:'C', title:'Best England XI for the opener?', replies:178, likes:423, time:'1d ago', hot:false },
+    ],
+  },
+  argentina: {
+    name: 'Argentina', nameZh: '阿根廷',
+    colors: { blue:'#6CACE4', gold:'#F6B40E', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇦🇷',
+    playersData: {
+      goalkeepers: [
+        { id:'martinez', name:'Emiliano Martinez', short:'E.Martinez', number:23, pos:'GK', country:'AR', age:33, matches:30, goals:0, assists:0, minutes:2700, saves:68, cleanSheets:14, passAcc:70 },
+        { id:'ruili', name:'Geronimo Rulli', short:'Rulli', number:1, pos:'GK', country:'AR', age:33, matches:8, goals:0, assists:0, minutes:720, saves:18, cleanSheets:3, passAcc:68 },
+      ],
+      defenders: [
+        { id:'romero', name:'Cristian Romero', short:'Romero', number:13, pos:'CB', country:'AR', age:27, matches:32, goals:2, assists:0, minutes:2720, tackles:46, interceptions:34, duelsWon:70, passAcc:87 },
+        { id:'otamendi', name:'Nicolas Otamendi', short:'Otamendi', number:19, pos:'CB', country:'AR', age:37, matches:28, goals:1, assists:1, minutes:2240, tackles:40, interceptions:30, duelsWon:66, passAcc:85 },
+        { id:'lisandro', name:'Lisandro Martinez', short:'Lisandro', number:25, pos:'CB', country:'AR', age:27, matches:24, goals:1, assists:1, minutes:1960, tackles:38, interceptions:26, duelsWon:64, passAcc:86 },
+        { id:'molina', name:'Nahuel Molina', short:'Molina', number:26, pos:'RB', country:'AR', age:27, matches:26, goals:1, assists:4, minutes:2080, tackles:32, interceptions:22, duelsWon:60, passAcc:83 },
+        { id:'tagliafico', name:'Nicolas Tagliafico', short:'Tagliafico', number:3, pos:'LB', country:'AR', age:33, matches:28, goals:1, assists:3, minutes:2240, tackles:34, interceptions:24, duelsWon:62, passAcc:82 },
+      ],
+      midfielders: [
+        { id:'enzo', name:'Enzo Fernandez', short:'Enzo', number:24, pos:'CM', country:'AR', age:25, matches:34, goals:4, assists:6, minutes:2900, tackles:52, interceptions:36, duelsWon:64, passAcc:88, keyPasses:34 },
+        { id:'depaul', name:'Rodrigo De Paul', short:'De Paul', number:7, pos:'CM', country:'AR', age:31, matches:36, goals:3, assists:8, minutes:3080, tackles:56, interceptions:38, duelsWon:66, passAcc:87, keyPasses:42 },
+        { id:'macallister', name:'Alexis Mac Allister', short:'Mac Allister', number:20, pos:'AM', country:'AR', age:26, matches:32, goals:6, assists:8, minutes:2720, tackles:42, interceptions:28, duelsWon:60, passAcc:86, keyPasses:38 },
+        { id:'lo_celso', name:'Giovani Lo Celso', short:'Lo Celso', number:11, pos:'AM', country:'AR', age:29, matches:26, goals:3, assists:5, minutes:1960, tackles:34, interceptions:22, duelsWon:58, passAcc:85, keyPasses:30 },
+      ],
+      forwards: [
+        { id:'messi', name:'Lionel Messi', short:'Messi', number:10, pos:'ST', country:'AR', age:39, matches:30, goals:18, assists:14, minutes:2520, tackles:12, interceptions:8, duelsWon:48, passAcc:87, keyPasses:52 },
+        { id:'alvarez', name:'Julian Alvarez', short:'Alvarez', number:9, pos:'ST', country:'AR', age:26, matches:34, goals:20, assists:8, minutes:2720, tackles:22, interceptions:14, duelsWon:56, passAcc:82, keyPasses:34 },
+        { id:'lautaro', name:'Lautaro Martinez', short:'Lautaro', number:22, pos:'ST', country:'AR', age:28, matches:32, goals:24, assists:6, minutes:2720, tackles:20, interceptions:12, duelsWon:58, passAcc:80, keyPasses:28 },
+        { id:'di_maria', name:'Angel Di Maria', short:'Di Maria', number:11, pos:'RW', country:'AR', age:38, matches:18, goals:4, assists:8, minutes:1260, tackles:14, interceptions:10, duelsWon:52, passAcc:84, keyPasses:32 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Argentina', away:'Morocco', homeScore:null, awayScore:null, date:'2026-06-13', comp:'World Cup Group A', status:'UPCOMING', time:'15:00 EST' },
+      { id:2, home:'Argentina', away:'Chile', homeScore:null, awayScore:null, date:'2026-06-19', comp:'World Cup Group A', status:'UPCOMING', time:'18:00 EST' },
+      { id:3, home:'Argentina', away:'Ukraine', homeScore:null, awayScore:null, date:'2026-06-25', comp:'World Cup Group A', status:'UPCOMING', time:'20:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Messi confirms 2026 will be his final World Cup`, excerpt:`The Inter Miami star announces his intention to retire from international football after the tournament.`, time:'1h ago', tag:'Interview', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Scaloni names squad for title defence`, excerpt:`The Argentina manager keeps faith with the core group that won the 2022 World Cup in Qatar.`, time:'4h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Alvarez in red-hot form ahead of tournament`, excerpt:`The Atletico Madrid striker has scored 12 goals in his last 10 appearances for club and country.`, time:'1d ago', tag:'Form', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'LaAlbiceleste', avatar:'A', title:'Can Messi win back-to-back World Cups?', replies:678, likes:1500, time:'30m ago', hot:true },
+      { id:2, author:'Scaloneta', avatar:'S', title:'Argentina vs France final rematch?', replies:345, likes:890, time:'3h ago', hot:true },
+      { id:3, author:'VamosArgentina', avatar:'V', title:'Who partners Messi in attack?', replies:123, likes:456, time:'8h ago', hot:false },
+    ],
+  },
+  spain: {
+    name: 'Spain', nameZh: '西班牙',
+    colors: { blue:'#C60B1E', gold:'#FFC400', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇪🇸',
+    playersData: {
+      goalkeepers: [
+        { id:'simon', name:'Unai Simon', short:'Simon', number:1, pos:'GK', country:'ES', age:28, matches:32, goals:0, assists:0, minutes:2880, saves:74, cleanSheets:13, passAcc:76 },
+        { id:'raya', name:'David Raya', short:'Raya', number:13, pos:'GK', country:'ES', age:30, matches:10, goals:0, assists:0, minutes:900, saves:24, cleanSheets:4, passAcc:78 },
+      ],
+      defenders: [
+        { id:'carvajal', name:'Dani Carvajal', short:'Carvajal', number:2, pos:'RB', country:'ES', age:34, matches:28, goals:1, assists:4, minutes:2240, tackles:34, interceptions:24, duelsWon:60, passAcc:85 },
+        { id:'laporte', name:'Aymeric Laporte', short:'Laporte', number:14, pos:'CB', country:'ES', age:31, matches:30, goals:2, assists:1, minutes:2520, tackles:38, interceptions:32, duelsWon:68, passAcc:90 },
+        { id:'le_normand', name:'Robin Le Normand', short:'Le Normand', number:3, pos:'CB', country:'ES', age:29, matches:26, goals:1, assists:0, minutes:2080, tackles:36, interceptions:28, duelsWon:64, passAcc:86 },
+        { id:'grimaldo', name:'Alex Grimaldo', short:'Grimaldo', number:12, pos:'LB', country:'ES', age:30, matches:24, goals:2, assists:6, minutes:1960, tackles:30, interceptions:22, duelsWon:58, passAcc:84 },
+        { id:'cucurella', name:'Marc Cucurella', short:'Cucurella', number:24, pos:'LB', country:'ES', age:27, matches:20, goals:0, assists:3, minutes:1400, tackles:28, interceptions:20, duelsWon:60, passAcc:82 },
+      ],
+      midfielders: [
+        { id:'rodri', name:'Rodri Hernandez', short:'Rodri', number:16, pos:'DM', country:'ES', age:29, matches:36, goals:4, assists:3, minutes:3160, tackles:68, interceptions:50, duelsWon:70, passAcc:92, keyPasses:28 },
+        { id:'pedri', name:'Pedri Gonzalez', short:'Pedri', number:8, pos:'CM', country:'ES', age:23, matches:32, goals:5, assists:8, minutes:2720, tackles:44, interceptions:30, duelsWon:62, passAcc:89, keyPasses:42 },
+        { id:'olmo', name:'Dani Olmo', short:'Olmo', number:10, pos:'AM', country:'ES', age:27, matches:30, goals:8, assists:10, minutes:2520, tackles:36, interceptions:24, duelsWon:58, passAcc:86, keyPasses:48 },
+        { id:'merino', name:'Mikel Merino', short:'Merino', number:6, pos:'CM', country:'ES', age:29, matches:28, goals:3, assists:4, minutes:2240, tackles:48, interceptions:34, duelsWon:64, passAcc:87, keyPasses:26 },
+      ],
+      forwards: [
+        { id:'yamal', name:'Lamine Yamal', short:'Yamal', number:19, pos:'RW', country:'ES', age:18, matches:28, goals:12, assists:14, minutes:2240, tackles:18, interceptions:12, duelsWon:54, passAcc:84, keyPasses:52 },
+        { id:'williams', name:'Nico Williams', short:'Nico', number:17, pos:'LW', country:'ES', age:23, matches:30, goals:10, assists:8, minutes:2520, tackles:24, interceptions:16, duelsWon:60, passAcc:82, keyPasses:38 },
+        { id:'morata', name:'Alvaro Morata', short:'Morata', number:7, pos:'ST', country:'ES', age:33, matches:26, goals:12, assists:4, minutes:2080, tackles:20, interceptions:14, duelsWon:58, passAcc:80, keyPasses:24 },
+        { id:'ferran', name:'Ferran Torres', short:'Ferran', number:11, pos:'ST', country:'ES', age:26, matches:22, goals:8, assists:4, minutes:1540, tackles:16, interceptions:10, duelsWon:52, passAcc:83, keyPasses:28 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Spain', away:'Australia', homeScore:null, awayScore:null, date:'2026-06-14', comp:'World Cup Group D', status:'UPCOMING', time:'14:00 EST' },
+      { id:2, home:'Spain', away:'Ecuador', homeScore:null, awayScore:null, date:'2026-06-20', comp:'World Cup Group D', status:'UPCOMING', time:'17:00 EST' },
+      { id:3, home:'Spain', away:'Cameroon', homeScore:null, awayScore:null, date:'2026-06-26', comp:'World Cup Group D', status:'UPCOMING', time:'19:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Yamal named Golden Boy 2025`, excerpt:`The Barcelona wonderkid continues to break records and win individual awards at just 18 years old.`, time:'2h ago', tag:'Awards', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`De la Fuente announces World Cup squad`, excerpt:`The Spain manager includes several exciting young talents alongside experienced Euro 2024 winners.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Rodri returns from injury layoff`, excerpt:`The Manchester City midfielder is fit again and ready to anchor Spain's midfield in North America.`, time:'1d ago', tag:'Injury', icon:'heart', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'LaRoja', avatar:'R', title:'Can Spain win back-to-back major titles?', replies:432, likes:980, time:'2h ago', hot:true },
+      { id:2, author:'VamosEspana', avatar:'V', title:'Yamal vs Saka: best young winger?', replies:256, likes:654, time:'5h ago', hot:true },
+      { id:3, author:'TikiTaka', avatar:'T', title:'Is Pedri the new Iniesta?', replies:167, likes:432, time:'1d ago', hot:false },
+    ],
+  },
+  germany: {
+    name: 'Germany', nameZh: '德国',
+    colors: { blue:'#000000', gold:'#FFCE00', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇩🇪',
+    playersData: {
+      goalkeepers: [
+        { id:'ter_stegen', name:'Marc-Andre ter Stegen', short:'Ter Stegen', number:1, pos:'GK', country:'DE', age:34, matches:30, goals:0, assists:0, minutes:2700, saves:72, cleanSheets:12, passAcc:82 },
+        { id:'nuer', name:'Manuel Neuer', short:'Neuer', number:22, pos:'GK', country:'DE', age:40, matches:8, goals:0, assists:0, minutes:720, saves:18, cleanSheets:3, passAcc:78 },
+      ],
+      defenders: [
+        { id:'kimmich', name:'Joshua Kimmich', short:'Kimmich', number:6, pos:'RB', country:'DE', age:31, matches:34, goals:2, assists:8, minutes:2900, tackles:48, interceptions:36, duelsWon:66, passAcc:90 },
+        { id:'rudiger', name:'Antonio Rudiger', short:'Rudiger', number:2, pos:'CB', country:'DE', age:32, matches:32, goals:2, assists:1, minutes:2720, tackles:46, interceptions:38, duelsWon:70, passAcc:86 },
+        { id:'tah', name:'Jonathan Tah', short:'Tah', number:4, pos:'CB', country:'DE', age:29, matches:28, goals:1, assists:0, minutes:2240, tackles:38, interceptions:30, duelsWon:66, passAcc:85 },
+        { id:'mittelstaedt', name:'Maximilian Mittelstadt', short:'Mittelstadt', number:3, pos:'LB', country:'DE', age:28, matches:22, goals:1, assists:3, minutes:1760, tackles:32, interceptions:24, duelsWon:60, passAcc:82 },
+      ],
+      midfielders: [
+        { id:'gundogan', name:'Ilkay Gundogan', short:'Gundogan', number:21, pos:'CM', country:'DE', age:35, matches:30, goals:4, assists:6, minutes:2520, tackles:42, interceptions:28, duelsWon:60, passAcc:89, keyPasses:34 },
+        { id:'musiala', name:'Jamal Musiala', short:'Musiala', number:10, pos:'AM', country:'DE', age:23, matches:34, goals:14, assists:10, minutes:2900, tackles:38, interceptions:24, duelsWon:62, passAcc:88, keyPasses:46 },
+        { id:'wirtz', name:'Florian Wirtz', short:'Wirtz', number:17, pos:'AM', country:'DE', age:23, matches:32, goals:10, assists:12, minutes:2720, tackles:34, interceptions:22, duelsWon:58, passAcc:87, keyPasses:48 },
+        { id:'andrich', name:'Robert Andrich', short:'Andrich', number:23, pos:'DM', country:'DE', age:31, matches:26, goals:2, assists:2, minutes:1960, tackles:52, interceptions:34, duelsWon:64, passAcc:85, keyPasses:20 },
+      ],
+      forwards: [
+        { id:'havertz', name:'Kai Havertz', short:'Havertz', number:7, pos:'ST', country:'DE', age:27, matches:32, goals:14, assists:6, minutes:2720, tackles:22, interceptions:14, duelsWon:56, passAcc:83, keyPasses:32 },
+        { id:'fullkrug', name:'Niclas Fullkrug', short:'Fullkrug', number:9, pos:'ST', country:'DE', age:33, matches:24, goals:12, assists:3, minutes:1800, tackles:18, interceptions:12, duelsWon:58, passAcc:79, keyPasses:22 },
+        { id:'sane', name:'Leroy Sane', short:'Sane', number:19, pos:'RW', country:'DE', age:30, matches:28, goals:8, assists:8, minutes:2240, tackles:24, interceptions:16, duelsWon:56, passAcc:84, keyPasses:38 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Germany', away:'South Korea', homeScore:null, awayScore:null, date:'2026-06-15', comp:'World Cup Group F', status:'UPCOMING', time:'15:00 EST' },
+      { id:2, home:'Germany', away:'Colombia', homeScore:null, awayScore:null, date:'2026-06-21', comp:'World Cup Group F', status:'UPCOMING', time:'18:00 EST' },
+      { id:3, home:'Germany', away:'Poland', homeScore:null, awayScore:null, date:'2026-06-27', comp:'World Cup Group F', status:'UPCOMING', time:'20:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Nagelsmann extends contract until 2028`, excerpt:`The Germany manager commits his long-term future to the DFB after impressive Euro 2024 performance.`, time:'3h ago', tag:'Management', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Musiala and Wirtz: the new Muller and Ozil?`, excerpt:`Germany's dynamic duo are being compared to the country's greatest attacking midfield partnerships.`, time:'6h ago', tag:'Analysis', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Ter Stegen confirmed as No.1`, excerpt:`The Barcelona goalkeeper finally gets his chance as Germany's first-choice at a major tournament.`, time:'1d ago', tag:'Squad', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'DieMannschaft', avatar:'D', title:'Can Germany win on home soil... again?', replies:534, likes:1200, time:'1h ago', hot:true },
+      { id:2, author:'BundesligaFan', avatar:'B', title:'Musiala vs Wirtz: who is more important?', replies:345, likes:876, time:'4h ago', hot:true },
+      { id:3, author:'Berlin2026', avatar:'B', title:'Best German XI since 2014?', replies:198, likes:543, time:'1d ago', hot:false },
+    ],
+  },
+  portugal: {
+    name: 'Portugal', nameZh: '葡萄牙',
+    colors: { blue:'#006600', gold:'#FF0000', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇵🇹',
+    playersData: {
+      goalkeepers: [
+        { id:'costa', name:'Diogo Costa', short:'Costa', number:1, pos:'GK', country:'PT', age:26, matches:32, goals:0, assists:0, minutes:2880, saves:78, cleanSheets:14, passAcc:76 },
+        { id:'patricio', name:'Rui Patricio', short:'Patricio', number:22, pos:'GK', country:'PT', age:37, matches:8, goals:0, assists:0, minutes:720, saves:20, cleanSheets:3, passAcc:72 },
+      ],
+      defenders: [
+        { id:'dias', name:'Ruben Dias', short:'Dias', number:4, pos:'CB', country:'PT', age:28, matches:34, goals:2, assists:1, minutes:2900, tackles:44, interceptions:36, duelsWon:70, passAcc:89 },
+        { id:'silva', name:'Bernardo Silva', short:'B.Silva', number:10, pos:'AM', country:'PT', age:31, matches:32, goals:8, assists:12, minutes:2720, tackles:38, interceptions:24, duelsWon:60, passAcc:88, keyPasses:48 },
+        { id:'cancelo', name:'Joao Cancelo', short:'Cancelo', number:2, pos:'RB', country:'PT', age:31, matches:30, goals:2, assists:6, minutes:2520, tackles:36, interceptions:28, duelsWon:62, passAcc:86 },
+        { id:'mendes', name:'Nuno Mendes', short:'Mendes', number:3, pos:'LB', country:'PT', age:23, matches:26, goals:1, assists:4, minutes:2080, tackles:32, interceptions:22, duelsWon:60, passAcc:83 },
+        { id:'dalot', name:'Diogo Dalot', short:'Dalot', number:5, pos:'RB', country:'PT', age:26, matches:22, goals:1, assists:2, minutes:1680, tackles:28, interceptions:20, duelsWon:58, passAcc:84 },
+      ],
+      midfielders: [
+        { id:'vitinha', name:'Vitinha Ferreira', short:'Vitinha', number:18, pos:'CM', country:'PT', age:26, matches:30, goals:4, assists:6, minutes:2520, tackles:46, interceptions:32, duelsWon:62, passAcc:89, keyPasses:34 },
+        { id:'neves', name:'Joao Neves', short:'Neves', number:15, pos:'CM', country:'PT', age:21, matches:28, goals:2, assists:4, minutes:2240, tackles:42, interceptions:28, duelsWon:60, passAcc:88, keyPasses:28 },
+        { id:'fernandes', name:'Bruno Fernandes', short:'Fernandes', number:8, pos:'AM', country:'PT', age:31, matches:34, goals:12, assists:14, minutes:2900, tackles:40, interceptions:26, duelsWon:58, passAcc:85, keyPasses:52 },
+      ],
+      forwards: [
+        { id:'ronaldo', name:'Cristiano Ronaldo', short:'Ronaldo', number:7, pos:'ST', country:'PT', age:41, matches:28, goals:22, assists:4, minutes:2240, tackles:12, interceptions:8, duelsWon:50, passAcc:78, keyPasses:24 },
+        { id:'leao', name:'Rafael Leao', short:'Leao', number:11, pos:'LW', country:'PT', age:27, matches:32, goals:14, assists:10, minutes:2720, tackles:22, interceptions:14, duelsWon:58, passAcc:82, keyPasses:42 },
+        { id:'felix', name:'Joao Felix', short:'Felix', number:9, pos:'ST', country:'PT', age:26, matches:26, goals:10, assists:6, minutes:1960, tackles:18, interceptions:12, duelsWon:54, passAcc:83, keyPasses:32 },
+        { id:'neto', name:'Pedro Neto', short:'Neto', number:25, pos:'RW', country:'PT', age:25, matches:20, goals:6, assists:6, minutes:1400, tackles:16, interceptions:10, duelsWon:52, passAcc:81, keyPasses:28 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Portugal', away:'Mexico', homeScore:null, awayScore:null, date:'2026-06-14', comp:'World Cup Group H', status:'UPCOMING', time:'16:00 EST' },
+      { id:2, home:'Portugal', away:'Switzerland', homeScore:null, awayScore:null, date:'2026-06-20', comp:'World Cup Group H', status:'UPCOMING', time:'19:00 EST' },
+      { id:3, home:'Portugal', away:'Ghana', homeScore:null, awayScore:null, date:'2026-06-26', comp:'World Cup Group H', status:'UPCOMING', time:'15:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Ronaldo: "I will never retire from Portugal"`, excerpt:`The Al-Nassr striker insists he will continue representing his country for as long as he is selected.`, time:'2h ago', tag:'Interview', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Martinez finalises Portugal squad`, excerpt:`The Portugal manager includes Ronaldo and Pepe in his squad for what could be their final World Cup.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Leao in stunning form for AC Milan`, excerpt:`The Portuguese winger has been unstoppable in Serie A, scoring 15 goals before the World Cup break.`, time:'1d ago', tag:'Form', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'Seleccao', avatar:'S', title:`Ronaldo's last dance: how far can Portugal go?`, replies:567, likes:1300, time:'30m ago', hot:true },
+      { id:2, author:'PortugalFan', avatar:'P', title:'Should Ronaldo start or come off the bench?', replies:423, likes:980, time:'3h ago', hot:true },
+      { id:3, author:'Cristiano7', avatar:'C', title:'Portugal vs Argentina in the final?', replies:234, likes:654, time:'1d ago', hot:false },
+    ],
+  },
+  netherlands: {
+    name: 'Netherlands', nameZh: '荷兰',
+    colors: { blue:'#FF4F00', gold:'#FFFFFF', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇳🇱',
+    playersData: {
+      goalkeepers: [
+        { id:'verbruggen', name:'Bart Verbruggen', short:'Verbruggen', number:1, pos:'GK', country:'NL', age:23, matches:28, goals:0, assists:0, minutes:2520, saves:68, cleanSheets:11, passAcc:78 },
+        { id:'flecken', name:'Mark Flekken', short:'Flekken', number:13, pos:'GK', country:'NL', age:32, matches:10, goals:0, assists:0, minutes:900, saves:22, cleanSheets:4, passAcc:74 },
+      ],
+      defenders: [
+        { id:'van_dijk', name:'Virgil van Dijk', short:'Van Dijk', number:4, pos:'CB', country:'NL', age:34, matches:32, goals:3, assists:1, minutes:2880, tackles:42, interceptions:34, duelsWon:72, passAcc:90 },
+        { id:'de_ligt', name:'Matthijs de Ligt', short:'De Ligt', number:3, pos:'CB', country:'NL', age:26, matches:28, goals:2, assists:0, minutes:2380, tackles:38, interceptions:30, duelsWon:68, passAcc:87 },
+        { id:'ake', name:'Nathan Ake', short:'Ake', number:5, pos:'CB', country:'NL', age:30, matches:26, goals:1, assists:1, minutes:2080, tackles:34, interceptions:26, duelsWon:64, passAcc:85 },
+        { id:'dumfries', name:'Denzel Dumfries', short:'Dumfries', number:22, pos:'RB', country:'NL', age:29, matches:28, goals:3, assists:5, minutes:2380, tackles:36, interceptions:24, duelsWon:62, passAcc:82 },
+        { id:'frimpong', name:'Jeremie Frimpong', short:'Frimpong', number:2, pos:'RB', country:'NL', age:24, matches:22, goals:2, assists:4, minutes:1760, tackles:30, interceptions:20, duelsWon:58, passAcc:83 },
+      ],
+      midfielders: [
+        { id:'de_jong', name:'Frenkie de Jong', short:'De Jong', number:21, pos:'CM', country:'NL', age:28, matches:30, goals:3, assists:6, minutes:2520, tackles:46, interceptions:32, duelsWon:66, passAcc:91, keyPasses:36 },
+        { id:'reijnders', name:'Tijjani Reijnders', short:'Reijnders', number:14, pos:'CM', country:'NL', age:27, matches:28, goals:4, assists:4, minutes:2240, tackles:40, interceptions:28, duelsWon:62, passAcc:87, keyPasses:30 },
+        { id:'simons', name:'Xavi Simons', short:'Simons', number:7, pos:'AM', country:'NL', age:23, matches:32, goals:10, assists:8, minutes:2720, tackles:34, interceptions:22, duelsWon:58, passAcc:86, keyPasses:42 },
+        { id:'gravenberch', name:'Ryan Gravenberch', short:'Gravenberch', number:16, pos:'DM', country:'NL', age:23, matches:24, goals:2, assists:3, minutes:1960, tackles:44, interceptions:30, duelsWon:64, passAcc:88, keyPasses:24 },
+      ],
+      forwards: [
+        { id:'depay', name:'Memphis Depay', short:'Depay', number:10, pos:'ST', country:'NL', age:32, matches:28, goals:14, assists:8, minutes:2240, tackles:22, interceptions:14, duelsWon:56, passAcc:82, keyPasses:34 },
+        { id:'gakpo', name:'Cody Gakpo', short:'Gakpo', number:11, pos:'LW', country:'NL', age:26, matches:32, goals:16, assists:8, minutes:2720, tackles:24, interceptions:16, duelsWon:60, passAcc:83, keyPasses:38 },
+        { id:'malen', name:'Donyell Malen', short:'Malen', number:9, pos:'RW', country:'NL', age:26, matches:24, goals:8, assists:4, minutes:1680, tackles:18, interceptions:12, duelsWon:54, passAcc:81, keyPasses:26 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Netherlands', away:'Iran', homeScore:null, awayScore:null, date:'2026-06-15', comp:'World Cup Group E', status:'UPCOMING', time:'14:00 EST' },
+      { id:2, home:'Netherlands', away:'Senegal', homeScore:null, awayScore:null, date:'2026-06-21', comp:'World Cup Group E', status:'UPCOMING', time:'17:00 EST' },
+      { id:3, home:'Netherlands', away:'Costa Rica', homeScore:null, awayScore:null, date:'2026-06-27', comp:'World Cup Group E', status:'UPCOMING', time:'19:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Van Dijk named Netherlands captain`, excerpt:`The Liverpool defender will lead the Oranje in their quest for a first World Cup title in North America.`, time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Koeman includes 6 new faces in squad`, excerpt:`The Netherlands manager rewards Eredivisie talent with surprise call-ups for the World Cup.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`De Jong declares himself 100% fit`, excerpt:`The Barcelona midfielder overcomes ankle concerns just in time for the tournament opener.`, time:'1d ago', tag:'Injury', icon:'heart', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'Oranje', avatar:'O', title:'Can the Netherlands finally win the World Cup?', replies:456, likes:1000, time:'1h ago', hot:true },
+      { id:2, author:'TotalFootball', avatar:'T', title:'Van Dijk vs Upamecano: best CB at the tournament?', replies:234, likes:567, time:'4h ago', hot:true },
+      { id:3, author:'Amsterdam', avatar:'A', title:'Will Xavi Simons have a breakout tournament?', replies:156, likes:432, time:'1d ago', hot:false },
+    ],
+  },
+  italy: {
+    name: 'Italy', nameZh: '意大利',
+    colors: { blue:'#0066CC', gold:'#FFFFFF', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇮🇹',
+    playersData: {
+      goalkeepers: [
+        { id:'donnarumma', name:'Gianluigi Donnarumma', short:'Donnarumma', number:1, pos:'GK', country:'IT', age:27, matches:34, goals:0, assists:0, minutes:3060, saves:82, cleanSheets:15, passAcc:74 },
+        { id:'vicario', name:'Guglielmo Vicario', short:'Vicario', number:12, pos:'GK', country:'IT', age:29, matches:8, goals:0, assists:0, minutes:720, saves:20, cleanSheets:3, passAcc:72 },
+      ],
+      defenders: [
+        { id:'bastoni', name:'Alessandro Bastoni', short:'Bastoni', number:3, pos:'CB', country:'IT', age:26, matches:30, goals:2, assists:2, minutes:2520, tackles:38, interceptions:32, duelsWon:68, passAcc:89 },
+        { id:'calafiori', name:'Riccardo Calafiori', short:'Calafiori', number:5, pos:'CB', country:'IT', age:23, matches:24, goals:1, assists:1, minutes:1960, tackles:34, interceptions:26, duelsWon:64, passAcc:86 },
+        { id:'dimarco', name:'Federico Dimarco', short:'Dimarco', number:2, pos:'LB', country:'IT', age:28, matches:28, goals:3, assists:6, minutes:2380, tackles:32, interceptions:22, duelsWon:60, passAcc:85 },
+        { id:'di_lorenzo', name:'Giovanni Di Lorenzo', short:'Di Lorenzo', number:22, pos:'RB', country:'IT', age:32, matches:26, goals:1, assists:3, minutes:2080, tackles:30, interceptions:24, duelsWon:62, passAcc:84 },
+        { id:'mancini', name:'Gianluca Mancini', short:'Mancini', number:23, pos:'CB', country:'IT', age:29, matches:20, goals:1, assists:0, minutes:1540, tackles:28, interceptions:22, duelsWon:60, passAcc:85 },
+      ],
+      midfielders: [
+        { id:'barella', name:'Nicolo Barella', short:'Barella', number:8, pos:'CM', country:'IT', age:28, matches:32, goals:5, assists:8, minutes:2720, tackles:50, interceptions:34, duelsWon:66, passAcc:89, keyPasses:38 },
+        { id:'jorginho', name:'Jorginho Frello', short:'Jorginho', number:6, pos:'DM', country:'IT', age:34, matches:28, goals:2, assists:3, minutes:2240, tackles:44, interceptions:32, duelsWon:62, passAcc:91, keyPasses:28 },
+        { id:'frattesi', name:'Davide Frattesi', short:'Frattesi', number:7, pos:'CM', country:'IT', age:26, matches:26, goals:4, assists:3, minutes:1960, tackles:40, interceptions:28, duelsWon:64, passAcc:86, keyPasses:24 },
+        { id:'pellegrini', name:'Lorenzo Pellegrini', short:'Pellegrini', number:10, pos:'AM', country:'IT', age:29, matches:24, goals:6, assists:6, minutes:1960, tackles:30, interceptions:20, duelsWon:58, passAcc:85, keyPasses:32 },
+      ],
+      forwards: [
+        { id:'retgui', name:'Mateo Retegui', short:'Retegui', number:9, pos:'ST', country:'IT', age:26, matches:28, goals:16, assists:4, minutes:2240, tackles:20, interceptions:14, duelsWon:58, passAcc:80, keyPasses:26 },
+        { id:'kean', name:'Moise Kean', short:'Kean', number:11, pos:'ST', country:'IT', age:26, matches:24, goals:10, assists:2, minutes:1680, tackles:16, interceptions:10, duelsWon:54, passAcc:78, keyPasses:22 },
+        { id:'raspadori', name:'Giacomo Raspadori', short:'Raspadori', number:25, pos:'LW', country:'IT', age:26, matches:20, goals:6, assists:4, minutes:1260, tackles:14, interceptions:10, duelsWon:52, passAcc:82, keyPasses:24 },
+        { id:'chiesa', name:'Federico Chiesa', short:'Chiesa', number:14, pos:'RW', country:'IT', age:28, matches:22, goals:8, assists:6, minutes:1680, tackles:18, interceptions:12, duelsWon:56, passAcc:81, keyPasses:30 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Italy', away:'Saudi Arabia', homeScore:null, awayScore:null, date:'2026-06-13', comp:'World Cup Group C', status:'UPCOMING', time:'15:00 EST' },
+      { id:2, home:'Italy', away:'Paraguay', homeScore:null, awayScore:null, date:'2026-06-19', comp:'World Cup Group C', status:'UPCOMING', time:'18:00 EST' },
+      { id:3, home:'Italy', away:'Norway', homeScore:null, awayScore:null, date:'2026-06-25', comp:'World Cup Group C', status:'UPCOMING', time:'20:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`Donnarumma: "Italy will shock the world"`, excerpt:`The PSG goalkeeper is confident the Azzurri can repeat their Euro 2020 success on the biggest stage.`, time:'2h ago', tag:'Interview', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Spalletti names youthful Italy squad`, excerpt:`The Italy manager bets on a new generation as the Azzurri look to conquer North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Retegui in sensational scoring form`, excerpt:`The Atalanta striker has netted 20 goals in Serie A, making him one of the tournament's form players.`, time:'1d ago', tag:'Form', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'Azzurri', avatar:'A', title:'Can Italy win their 5th World Cup?', replies:389, likes:876, time:'2h ago', hot:true },
+      { id:2, author:'ForzaItalia', avatar:'F', title:'Retegui or Kean: who leads the line?', replies:198, likes:543, time:'5h ago', hot:true },
+      { id:3, author:'CalcioFan', avatar:'C', title:`Italy's defence: still the best in the world?`, replies:145, likes:398, time:'1d ago', hot:false },
+    ],
+  },
+  belgium: {
+    name: 'Belgium', nameZh: '比利时',
+    colors: { blue:'#000000', gold:'#FDDA24', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' },
+    flag: '🇧🇪',
+    playersData: {
+      goalkeepers: [
+        { id:'courtois', name:'Thibaut Courtois', short:'Courtois', number:1, pos:'GK', country:'BE', age:34, matches:30, goals:0, assists:0, minutes:2700, saves:68, cleanSheets:13, passAcc:76 },
+        { id:'casteels', name:'Koen Casteels', short:'Casteels', number:12, pos:'GK', country:'BE', age:33, matches:10, goals:0, assists:0, minutes:900, saves:22, cleanSheets:4, passAcc:72 },
+      ],
+      defenders: [
+        { id:'faes', name:'Wout Faes', short:'Faes', number:4, pos:'CB', country:'BE', age:27, matches:28, goals:1, assists:0, minutes:2240, tackles:36, interceptions:28, duelsWon:64, passAcc:86 },
+        { id:'de_winter', name:'Zeno De Winter', short:'De Winter', number:3, pos:'CB', country:'BE', age:23, matches:22, goals:1, assists:1, minutes:1760, tackles:32, interceptions:24, duelsWon:62, passAcc:85 },
+        { id:'castagne', name:'Timothy Castagne', short:'Castagne', number:21, pos:'RB', country:'BE', age:30, matches:26, goals:1, assists:3, minutes:2080, tackles:30, interceptions:22, duelsWon:60, passAcc:83 },
+        { id:'theate', name:'Arthur Theate', short:'Theate', number:5, pos:'CB', country:'BE', age:25, matches:20, goals:1, assists:0, minutes:1540, tackles:28, interceptions:22, duelsWon:60, passAcc:84 },
+      ],
+      midfielders: [
+        { id:'de_bruyne', name:'Kevin De Bruyne', short:'De Bruyne', number:7, pos:'AM', country:'BE', age:35, matches:30, goals:8, assists:16, minutes:2520, tackles:32, interceptions:20, duelsWon:56, passAcc:88, keyPasses:58 },
+        { id:'tielemans', name:'Youri Tielemans', short:'Tielemans', number:8, pos:'CM', country:'BE', age:28, matches:28, goals:4, assists:4, minutes:2240, tackles:42, interceptions:30, duelsWon:62, passAcc:87, keyPasses:30 },
+        { id:'onan', name:'Amadou Onana', short:'Onana', number:18, pos:'DM', country:'BE', age:24, matches:26, goals:2, assists:2, minutes:2080, tackles:50, interceptions:34, duelsWon:66, passAcc:85, keyPasses:22 },
+        { id:'vermeeren', name:'Arthur Vermeeren', short:'Vermeeren', number:24, pos:'CM', country:'BE', age:20, matches:18, goals:1, assists:2, minutes:1260, tackles:32, interceptions:22, duelsWon:58, passAcc:86, keyPasses:18 },
+      ],
+      forwards: [
+        { id:'lukaku', name:'Romelu Lukaku', short:'Lukaku', number:10, pos:'ST', country:'BE', age:32, matches:30, goals:20, assists:4, minutes:2520, tackles:16, interceptions:10, duelsWon:56, passAcc:78, keyPasses:24 },
+        { id:'trossard', name:'Leandro Trossard', short:'Trossard', number:11, pos:'LW', country:'BE', age:31, matches:28, goals:10, assists:8, minutes:2240, tackles:20, interceptions:14, duelsWon:54, passAcc:84, keyPasses:34 },
+        { id:'openda', name:'Lois Openda', short:'Openda', number:9, pos:'ST', country:'BE', age:25, matches:24, goals:12, assists:4, minutes:1800, tackles:18, interceptions:12, duelsWon:56, passAcc:80, keyPasses:26 },
+        { id:'bakayoko', name:'Johan Bakayoko', short:'Bakayoko', number:19, pos:'RW', country:'BE', age:22, matches:20, goals:6, assists:6, minutes:1400, tackles:14, interceptions:10, duelsWon:52, passAcc:82, keyPasses:28 },
+      ],
+    },
+    matchesData: [
+      { id:1, home:'Belgium', away:'Canada', homeScore:null, awayScore:null, date:'2026-06-14', comp:'World Cup Group F', status:'UPCOMING', time:'14:00 EST' },
+      { id:2, home:'Belgium', away:'Morocco', homeScore:null, awayScore:null, date:'2026-06-20', comp:'World Cup Group F', status:'UPCOMING', time:'17:00 EST' },
+      { id:3, home:'Belgium', away:'Croatia', homeScore:null, awayScore:null, date:'2026-06-26', comp:'World Cup Group F', status:'UPCOMING', time:'19:00 EST' },
+    ],
+    newsData: [
+      { id:1, title:`De Bruyne: "This is Belgium's golden generation finale"`, excerpt:`The Manchester City midfielder urges his teammates to seize their last chance at World Cup glory.`, time:'2h ago', tag:'Interview', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+      { id:2, title:`Tedesco announces Belgium squad`, excerpt:`The Belgium manager confirms De Bruyne and Lukaku will lead the Red Devils in North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+      { id:3, title:`Courtois returns from long-term injury`, excerpt:`The Real Madrid goalkeeper is fit and ready to anchor Belgium's defence at the World Cup.`, time:'1d ago', tag:'Injury', icon:'heart', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+    ],
+    topicsData: [
+      { id:1, author:'RedDevils', avatar:'R', title:`Belgium's last chance: how far can they go?`, replies:456, likes:1000, time:'1h ago', hot:true },
+      { id:2, author:'DeBruyneFan', avatar:'D', title:'Is De Bruyne still the best midfielder?', replies:278, likes:654, time:'4h ago', hot:true },
+      { id:3, author:'Brussels', avatar:'B', title:'Lukaku or Openda: who starts up front?', replies:156, likes:432, time:'1d ago', hot:false },
+    ],
+  },
 };
 
-const allPlayers = [...playersData.goalkeepers, ...playersData.defenders, ...playersData.midfielders, ...playersData.forwards];
-
-const matchesData = [
-  { id:1, home:'France', away:'Canada', homeScore:null, awayScore:null, date:'2026-06-12', comp:'World Cup Group I', status:'UPCOMING', time:'20:00 EST' },
-  { id:2, home:'France', away:'Israel', homeScore:null, awayScore:null, date:'2026-06-18', comp:'World Cup Group I', status:'UPCOMING', time:'18:00 EST' },
-  { id:3, home:'France', away:'New Zealand', homeScore:null, awayScore:null, date:'2026-06-24', comp:'World Cup Group I', status:'UPCOMING', time:'15:00 EST' },
-];
-
-const newsData = [
-  { id:1, title:`Mbappe named France captain for World Cup 2026`, excerpt:`Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title.`, time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
-  { id:2, title:`France unveils 26-man World Cup squad`, excerpt:`Deschamps includes surprise call-ups as Les Bleus aim for glory in North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
-  { id:3, title:`Griezmann: "This is my final World Cup"`, excerpt:`The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage.`, time:'1d ago', tag:'Interview', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
-  { id:4, title:`Training camp opens in Clairefontaine`, excerpt:`Les Bleus begin intensive preparations ahead of departure to the United States.`, time:'2d ago', tag:'Training', icon:'target', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600' },
-  { id:5, title:`Tactical analysis: France's 4-2-3-1 shape`, excerpt:`How Deschamps plans to balance attack and defence with a star-studded lineup.`, time:'3d ago', tag:'Tactics', icon:'heart', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=600' },
-];
-
-const topicsData = [
-  { id:1, author:'BleuFan_98', avatar:'B', title:'Will France win the 2026 World Cup?', replies:342, likes:890, time:'2h ago', hot:true },
-  { id:2, author:'FootballAnalyst', avatar:'F', title:'Mbappe vs Messi: Who scores more in the group stage?', replies:128, likes:456, time:'5h ago', hot:true },
-  { id:3, author:'Tactician_FR', avatar:'T', title:'Deschamps starting XI predictions', replies:89, likes:234, time:'8h ago', hot:false },
-  { id:4, author:'WorldCupDreamer', avatar:'W', title:'France vs Argentina final rematch?', replies:567, likes:1234, time:'1d ago', hot:true },
-  { id:5, author:'LesBleusHistory', avatar:'L', title:'Best French performance at a World Cup?', replies:45, likes:178, time:'2d ago', hot:false },
-];
+// ==================== HELPERS ====================
+function useTeam() {
+  const [teamId, setTeamId] = React.useState(() => {
+    try { return localStorage.getItem('wc_team') || 'france'; } catch(e) { return 'france'; }
+  });
+  const team = teamsData[teamId] || teamsData.france;
+  const setTeam = React.useCallback((id) => {
+    setTeamId(id);
+    try { localStorage.setItem('wc_team', id); } catch(e) {}
+    window.location.reload();
+  }, []);
+  return { teamId, team, setTeam };
+}
 
 const countryFlags = { 'ES':'🇪🇸','FR':'🇫🇷','BR':'🇧🇷','GB':'🇬🇧','BE':'🇧🇪','UA':'🇺🇦','DE':'🇩🇪','NL':'🇳🇱','UY':'🇺🇾','TR':'🇹🇷','MA':'🇲🇦','AR':'🇦🇷' };
 
@@ -286,7 +703,7 @@ function Icon({name,size=20,className=''}){
 
 function PlayerAvatar({name,size=40}){
   const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-  const colors=['#002395','#ED2939','#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
+  const colors=[team.colors.blue,team.colors.gold,'#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
   const color=colors[name.length%colors.length];
   return (
     <div className="rounded-full flex items-center justify-center font-bold text-white select-none" style={{width:size,height:size,background:color,fontSize:size*0.35}}>
@@ -300,10 +717,10 @@ function CountryFlag({code}){
 }
 
 // ==================== MATCH CENTER ====================
-function MatchCenter({t,lang}){
+function MatchCenter({t,lang,team}){
   const [activeMatch,setActiveMatch]=useState(0);
   const [selectedNews,setSelectedNews]=useState(null);
-  const match=matchesData[activeMatch];
+  const match=team.matchesData[activeMatch];
 
   return (
     <div className="pb-28 fade-in">
@@ -327,7 +744,7 @@ function MatchCenter({t,lang}){
 
       <div className="px-5 mb-4">
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-          {matchesData.map((m,i)=> (
+          {team.matchesData.map((m,i)=> (
             <button key={m.id} onClick={()=>setActiveMatch(i)} className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${activeMatch===i?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
               {m.comp} {m.status==='UPCOMING'?'· Upcoming':''}
             </button>
@@ -342,7 +759,7 @@ function MatchCenter({t,lang}){
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
                 <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-2 backdrop-blur-sm">
-                  <span className="text-xl font-black text-white">FR</span>
+                  <span className="text-xl font-black text-white">{team.flag}</span>
                 </div>
                 <p className="text-white font-semibold text-sm">{match.home}</p>
               </div>
@@ -357,7 +774,7 @@ function MatchCenter({t,lang}){
                 ):(
                   <div>
                     <div className="text-2xl font-black text-white font-mono">VS</div>
-                    <span className="text-rm-gold text-xs font-semibold mt-1 inline-block">{match.time}</span>
+                    <span className="text-rm-gold text-xs font-semibold mt-1 inline-block">{match.time||''}</span>
                     <p className="text-rm-muted text-xs mt-0.5">{match.date}</p>
                   </div>
                 )}
@@ -423,7 +840,7 @@ function MatchCenter({t,lang}){
       <div className="px-5 mb-5">
         <h2 className="text-white font-semibold mb-3">Latest News</h2>
         <div className="space-y-3">
-          {newsData.map(news=> (
+          {team.newsData.map(news=> (
             <div key={news.id} onClick={()=>setSelectedNews(news)} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-rm-blue/15 flex items-center justify-center flex-shrink-0">
                 <Icon name={news.icon} size={18} className="text-rm-blue"/>
@@ -689,7 +1106,7 @@ function PlayerDetail({t,lang,player,onBack}){
             <div className="relative pl-6 space-y-6">
               <div className="absolute left-2 top-2 bottom-2 w-px bg-rm-border"></div>
               {[
-                {year:'2024 - Present',club:'France National Team',desc:`${player.matches} apps · ${player.goals} goals`,active:true},
+                {year:'2024 - Present',club:team.name,desc:`${player.matches} apps · ${player.goals} goals`,active:true},
                 {year:'2022 - 2024',club:'Previous Club',desc:'48 apps · 22 goals',active:false},
                 {year:'2020 - 2022',club:'Youth Career',desc:'Academy progression',active:false},
               ].map((item,i)=> (
@@ -709,8 +1126,9 @@ function PlayerDetail({t,lang,player,onBack}){
 }
 
 // ==================== TACTICS ====================
-function Tactics({t,lang}){
+function Tactics({t,lang,team}){
   const [formation,setFormation]=useState('433');
+  const allPlayers=[...team.playersData.goalkeepers,...team.playersData.defenders,...team.playersData.midfielders,...team.playersData.forwards];
   const formations={
     '433':[
       {pos:'GK',x:50,y:88,player:'Courtois'},
@@ -894,10 +1312,10 @@ function Data({t,lang}){
         <h2 className="text-white font-semibold mb-3">Team Overview</h2>
         <div className="grid grid-cols-2 gap-3">
           {[
-            {label:t('goalsScored'),value:'112',sub:'+18% vs last season',good:true},
-            {label:t('goalsConceded'),value:'34',sub:'-8% vs last season',good:true},
-            {label:t('cleanSheets'),value:'18',sub:'Best in World Cup',good:true},
-            {label:t('winRate'),value:'76%',sub:'33W 5D 6L',good:true},
+            {label:t('goalsScored'),value:String(Math.floor(allPlayers.reduce((s,p)=>s+p.goals,0)*0.8)),sub:'Team Total',good:true},
+            {label:t('goalsConceded'),value:String(Math.floor(allPlayers.filter(p=>p.pos==='GK').reduce((s,p)=>s+(p.saves||0),0)*0.3)),sub:'Estimated',good:true},
+            {label:t('cleanSheets'),value:String(Math.floor(allPlayers.filter(p=>p.pos==='GK').reduce((s,p)=>s+(p.cleanSheets||0),0)*0.5)),sub:'Team Total',good:true},
+            {label:t('winRate'),value:'68%',sub:'Projected',good:true},
           ].map(s=> (
             <div key={s.label} className="bg-rm-card rounded-2xl p-4">
               <p className="text-rm-muted text-xs">{s.label}</p>
@@ -963,7 +1381,7 @@ function Community({t,lang}){
           <div className="flex items-center justify-between mb-4">
             <div className="text-center">
               <div className="w-12 h-12 rounded-full bg-rm-blue flex items-center justify-center mx-auto mb-1"><span className="text-white font-bold text-sm">RM</span></div>
-              <span className="text-white text-xs">France National Team</span>
+              <span className="text-white text-xs">{team.name}</span>
             </div>
             <div className="text-center px-4">
               <p className="text-rm-muted text-xs">vs</p>
@@ -999,7 +1417,7 @@ function Community({t,lang}){
       <div className="px-5">
         <h2 className="text-white font-semibold mb-3">Hot Topics</h2>
         <div className="space-y-3">
-          {topicsData.map(topic=> (
+          {team.topicsData.map(topic=> (
             <div key={topic.id} className="bg-rm-card rounded-2xl p-4">
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-full bg-rm-blue flex items-center justify-center flex-shrink-0">
@@ -1035,7 +1453,7 @@ function Community({t,lang}){
             <h3 className="text-white text-lg font-bold mb-4">{t('predictScore')}</h3>
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
-                <p className="text-white font-semibold mb-2">France</p>
+                <p className="text-white font-semibold mb-2">{team.name}</p>
                 <input type="number" min="0" max="10" value={predHome} onChange={e=>setPredHome(e.target.value)} className="w-16 h-16 bg-rm-surface rounded-2xl text-white text-3xl font-bold text-center font-mono border border-rm-border focus:border-rm-blue outline-none" placeholder="0"/>
               </div>
               <span className="text-rm-muted text-xl font-bold px-4">-</span>
@@ -1057,6 +1475,7 @@ function App(){
   const [activeTab,setActiveTab]=useState('match');
   const [selectedPlayer,setSelectedPlayer]=useState(null);
   const {lang,t,setLanguage}=useLanguage();
+  const {teamId,team,setTeam}=useTeam();
 
   const tabs=[
     {id:'match',label:t('matchCenter'),icon:'home'},
@@ -1076,6 +1495,11 @@ function App(){
         <div className="h-12 flex items-center justify-between px-6 bg-rm-dark/90 backdrop-blur-xl">
           <span className="text-white text-sm font-semibold">9:41</span>
           <div className="flex items-center gap-3">
+            <select value={teamId} onChange={e=>setTeam(e.target.value)} className="text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors border-none outline-none appearance-none cursor-pointer">
+              {Object.entries(teamsData).map(([k,v])=>(
+                <option key={k} value={k} className="bg-rm-dark text-white">{lang==='zh'?v.nameZh:v.name} {v.flag}</option>
+              ))}
+            </select>
             <button onClick={()=>setLanguage(lang==='zh'?'en':'zh')} className="text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors">
               {lang==='zh'?'EN':'中文'}
             </button>
@@ -1091,14 +1515,14 @@ function App(){
       {/* Content */}
       <div className="relative">
         {selectedPlayer?(
-          <PlayerDetail t={t} lang={lang} player={selectedPlayer} onBack={()=>setSelectedPlayer(null)}/>
+          <PlayerDetail t={t} lang={lang} team={team} player={selectedPlayer} onBack={()=>setSelectedPlayer(null)}/>
         ):(
           <>
-            {activeTab==='match'&&<MatchCenter t={t} lang={lang}/>}
-            {activeTab==='squad'&&<Squad t={t} lang={lang} onPlayerSelect={setSelectedPlayer}/>}
-            {activeTab==='tactics'&&<Tactics t={t} lang={lang}/>}
-            {activeTab==='data'&&<Data t={t} lang={lang}/>}
-            {activeTab==='community'&&<Community t={t} lang={lang}/>}
+            {activeTab==='match'&&<MatchCenter t={t} lang={lang} team={team}/>}
+            {activeTab==='squad'&&<Squad t={t} lang={lang} team={team} onPlayerSelect={setSelectedPlayer}/>}
+            {activeTab==='tactics'&&<Tactics t={t} lang={lang} team={team}/>}
+            {activeTab==='data'&&<Data t={t} lang={lang} team={team}/>}
+            {activeTab==='community'&&<Community t={t} lang={lang} team={team}/>}
           </>
         )}
       </div>
@@ -1147,7 +1571,7 @@ function InstallPrompt({t}){
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-white text-sm font-semibold">{t('addToHome')}</p>
-          <p className="text-rm-muted text-xs">{t('installDesc')}</p>
+          <p className="text-rm-muted text-xs">{lang==='zh'?`安装 ${team.nameZh} 数据获得最佳体验`:t('installDesc')}</p>
         </div>
         <button onClick={()=>{setShow(false);Storage.set('installDismissed',true);setDismissed(true);}} className="text-rm-muted hover:text-white transition-colors">
           <Icon name="x" size={18}/>

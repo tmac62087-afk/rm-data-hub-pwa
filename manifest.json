@@ -1,20 +1,20 @@
 {
-  "name": "France World Cup Stats",
-  "short_name": "FR Stats",
-  "description": "The ultimate data companion for Les Bleus fans worldwide",
+  "name": "World Cup 2026 Stats",
+  "short_name": "WC Stats",
+  "description": "The ultimate data companion for World Cup fans worldwide",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0A0F",
-  "theme_color": "#002395",
+  "theme_color": "#0A0A0F",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%23002395' rx='38'/%3E%3Ctext x='96' y='115' font-family='system-ui' font-size='72' font-weight='900' fill='white' text-anchor='middle'%3EFR%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%230A0A0F' rx='38'/%3E%3Ctext x='96' y='120' font-family='system-ui' font-size='64' font-weight='900' fill='white' text-anchor='middle'%3EWC%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23002395' rx='102'/%3E%3Ctext x='256' y='310' font-family='system-ui' font-size='192' font-weight='900' fill='white' text-anchor='middle'%3EFR%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230A0A0F' rx='102'/%3E%3Ctext x='256' y='320' font-family='system-ui' font-size='180' font-weight='900' fill='white' text-anchor='middle'%3EWC%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml"
     }

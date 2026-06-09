@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FR Stats">
+<meta name="theme-color" content="#0A0A0F">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23002395' rx='36'/%3E%3Ctext x='90' y='108' font-family='system-ui' font-size='68' font-weight='900' fill='white' text-anchor='middle'%3EFR%3C/text%3E%3C/svg%3E">
+<title>France World Cup Stats</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','system-ui'], mono: ['JetBrains Mono','monospace'] },
+      colors: {
+        rm: { blue:'#002395', gold:'#ED2939', dark:'#0A0A0F', card:'#1A1A24', surface:'#12121A', border:'#2A2A3A', muted:'#6B6B7B', accent:'#3B82F6' }
+      }
+    }
+  }
+}
+</script>
+<style>
+*{-webkit-tap-highlight-color:transparent;}
+body{background:#000;font-family:'Inter',sans-serif;overscroll-behavior:none;}
+.scrollbar-hide::-webkit-scrollbar{display:none;}
+.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none;}
+.text-gradient-gold{background:linear-gradient(135deg,#ED2939,#F0D878);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.glass{background:rgba(26,26,36,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+.field-bg{background:linear-gradient(180deg,#1a4a1a 0%,#0d2e0d 100%);position:relative;}
+.field-bg::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+.player-dot{box-shadow:0 0 0 3px rgba(212,175,55,0.4),0 4px 12px rgba(0,0,0,0.5);}
+.stat-bar-bg{background:rgba(255,255,255,0.07);border-radius:4px;height:7px;overflow:hidden;}
+.stat-bar-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.slide-up{animation:slideUp 0.35s ease-out;}
+.fade-in{animation:fadeIn 0.3s ease-out;}
+.pulse-dot{animation:pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+.skeleton{background:linear-gradient(90deg,#1A1A24 25%,#2A2A3A 50%,#1A1A24 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
+</style>
+</head>
+<body class="bg-black flex justify-center min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ==================== STORAGE ====================
+const Storage = {
+  get: (k, d) => { try { const v = localStorage.getItem('rm_'+k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
+  set: (k, v) => { try { localStorage.setItem('rm_'+k, JSON.stringify(v)); } catch(e){} },
+};
+
+
+// ==================== I18N ====================
+const translations = {
+  zh: {
+    matchCenter: '比赛中心',
+    squad: '阵容',
+    tactics: '战术',
+    data: '数据',
+    community: '社区',
+    season: '世界杯 2026',
+    playersCount: '名球员',
+    goalkeepers: '门将',
+    defenders: '后卫',
+    midfielders: '中场',
+    forwards: '前锋',
+    overview: '概览',
+    stats: '统计',
+    career: '生涯',
+    all: '全部',
+    upcoming: '即将开始',
+    finished: '已结束',
+    kickoffIn: '开球倒计时',
+    motm: '最佳球员',
+    possession: '控球率',
+    shots: '射门',
+    sot: '射正',
+    corners: '角球',
+    fouls: '犯规',
+    cleanSheets: '零封',
+    winRate: '胜率',
+    goalsScored: '进球数',
+    goalsConceded: '失球数',
+    rankings: '排行榜',
+    topScorers: '射手榜',
+    topAssists: '助攻榜',
+    minutes: '出场时间',
+    appearances: '出场次数',
+    saves: '扑救',
+    predictScore: '预测比分',
+    vs: '对阵',
+    hotTopics: '热门话题',
+    votes: '投票',
+    poll: '球迷投票',
+    addToHome: '添加到主屏幕',
+    installDesc: '安装 FR Stats 获得最佳体验',
+    settings: '设置',
+    language: '语言',
+    chinese: '中文',
+    english: 'English',
+    cancel: '取消',
+    save: '保存',
+    close: '关闭',
+    loadMore: '加载更多',
+    noEvents: '暂无赛事',
+    latestNews: '最新资讯',
+    worldCup: '世界杯',
+    groupStage: '小组赛',
+    knockout: '淘汰赛',
+  },
+  en: {
+    matchCenter: 'Match Center',
+    squad: 'Squad',
+    tactics: 'Tactics',
+    data: 'Data',
+    community: 'Community',
+    season: 'World Cup 2026',
+    playersCount: 'Players',
+    goalkeepers: 'Goalkeepers',
+    defenders: 'Defenders',
+    midfielders: 'Midfielders',
+    forwards: 'Forwards',
+    overview: 'Overview',
+    stats: 'Stats',
+    career: 'Career',
+    all: 'All',
+    upcoming: 'Upcoming',
+    finished: 'Finished',
+    kickoffIn: 'Kickoff in',
+    motm: 'MOTM',
+    possession: 'Possession',
+    shots: 'Shots',
+    sot: 'Shots on Target',
+    corners: 'Corners',
+    fouls: 'Fouls',
+    cleanSheets: 'Clean Sheets',
+    winRate: 'Win Rate',
+    goalsScored: 'Goals Scored',
+    goalsConceded: 'Goals Conceded',
+    rankings: 'Rankings',
+    topScorers: 'Top Scorers',
+    topAssists: 'Top Assists',
+    minutes: 'Minutes',
+    appearances: 'Appearances',
+    saves: 'Saves',
+    predictScore: 'Predict the Score',
+    vs: 'vs',
+    hotTopics: 'Hot Topics',
+    votes: 'Votes',
+    poll: 'Fan Poll',
+    addToHome: 'Add to Home Screen',
+    installDesc: 'Install FR Stats for the best experience',
+    settings: 'Settings',
+    language: 'Language',
+    chinese: '中文',
+    english: 'English',
+    cancel: 'Cancel',
+    save: 'Save',
+    close: 'Close',
+    loadMore: 'Load More',
+    noEvents: 'No Events',
+    latestNews: 'Latest News',
+    worldCup: 'World Cup',
+    groupStage: 'Group Stage',
+    knockout: 'Knockout',
+  }
+};
+
+function useLanguage() {
+  const [lang, setLang] = React.useState(() => {
+    try { return localStorage.getItem('fr_lang') || 'zh'; } catch(e) { return 'zh'; }
+  });
+  const t = React.useCallback((key) => {
+    return translations[lang]?.[key] || translations.en[key] || key;
+  }, [lang]);
+  const setLanguage = React.useCallback((l) => {
+    setLang(l);
+    try { localStorage.setItem('fr_lang', l); } catch(e) {}
+  }, []);
+  return { lang, t, setLanguage };
+}
+
+const posMap = { zh: { GK:'门将', CB:'中后卫', RB:'右后卫', LB:'左后卫', CM:'中场', DM:'后腰', AM:'前腰', ST:'前锋', LW:'左边锋', RW:'右边锋' }, en: { GK:'GK', CB:'CB', RB:'RB', LB:'LB', CM:'CM', DM:'DM', AM:'AM', ST:'ST', LW:'LW', RW:'RW' } };
+
+// ==================== DATA ====================
+const playersData = {
+  goalkeepers: [
+    { id:'maignan', name:'Mike Maignan', short:'Maignan', number:16, pos:'GK', country:'FR', age:30, matches:28, goals:0, assists:0, minutes:2520, saves:87, cleanSheets:14, passAcc:74 },
+    { id:'areola', name:'Alphonse Areola', short:'Areola', number:23, pos:'GK', country:'FR', age:32, matches:6, goals:0, assists:0, minutes:540, saves:18, cleanSheets:3, passAcc:70 },
+  ],
+  defenders: [
+    { id:'kounde', name:'Jules Kounde', short:'Kounde', number:5, pos:'RB', country:'FR', age:26, matches:38, goals:2, assists:5, minutes:3240, tackles:48, interceptions:32, duelsWon:65, passAcc:88 },
+    { id:'upamecano', name:'Dayot Upamecano', short:'Upamecano', number:2, pos:'CB', country:'FR', age:26, matches:32, goals:1, assists:1, minutes:2743, tackles:42, interceptions:38, duelsWon:70, passAcc:87 },
+    { id:'konate', name:'Ibrahima Konate', short:'Konate', number:24, pos:'CB', country:'FR', age:25, matches:28, goals:0, assists:0, minutes:2240, tackles:38, interceptions:30, duelsWon:72, passAcc:86 },
+    { id:'theo', name:'Theo Hernandez', short:'Theo H.', number:22, pos:'LB', country:'FR', age:28, matches:36, goals:4, assists:7, minutes:3100, tackles:44, interceptions:28, duelsWon:68, passAcc:84 },
+    { id:'pavard', name:'Benjamin Pavard', short:'Pavard', number:21, pos:'CB', country:'FR', age:29, matches:26, goals:2, assists:2, minutes:2080, tackles:34, interceptions:26, duelsWon:64, passAcc:89 },
+    { id:'clauss', name:'Jonathan Clauss', short:'Clauss', number:15, pos:'RB', country:'FR', age:32, matches:20, goals:1, assists:4, minutes:1600, tackles:30, interceptions:22, duelsWon:58, passAcc:82 },
+    { id:'digne', name:'Lucas Digne', short:'Digne', number:18, pos:'LB', country:'FR', age:31, matches:14, goals:0, assists:3, minutes:1120, tackles:24, interceptions:20, duelsWon:60, passAcc:83 },
+  ],
+  midfielders: [
+    { id:'tchouameni', name:'Aurelien Tchouameni', short:'Tchouameni', number:8, pos:'DM', country:'FR', age:25, matches:36, goals:2, assists:3, minutes:3020, tackles:68, interceptions:48, duelsWon:66, passAcc:89, keyPasses:28 },
+    { id:'camavinga', name:'Eduardo Camavinga', short:'Camavinga', number:6, pos:'CM', country:'FR', age:22, matches:34, goals:2, assists:4, minutes:2450, tackles:62, interceptions:35, duelsWon:68, passAcc:88, keyPasses:30 },
+    { id:'rabiot', name:'Adrien Rabiot', short:'Rabiot', number:14, pos:'CM', country:'FR', age:30, matches:32, goals:5, assists:3, minutes:2560, tackles:50, interceptions:32, duelsWon:64, passAcc:87, keyPasses:26 },
+    { id:'griezmann', name:'Antoine Griezmann', short:'Griezmann', number:7, pos:'AM', country:'FR', age:35, matches:38, goals:12, assists:14, minutes:3240, tackles:42, interceptions:28, duelsWon:60, passAcc:85, keyPasses:56 },
+    { id:'kante', name:'N\'Golo Kante', short:'Kante', number:13, pos:'DM', country:'FR', age:34, matches:28, goals:1, assists:2, minutes:2100, tackles:58, interceptions:42, duelsWon:62, passAcc:86, keyPasses:18 },
+    { id:'yfofana', name:'Youssouf Fofana', short:'Y.Fofana', number:19, pos:'CM', country:'FR', age:25, matches:20, goals:1, assists:2, minutes:1400, tackles:32, interceptions:22, duelsWon:60, passAcc:84, keyPasses:20 },
+  ],
+  forwards: [
+    { id:'mbappe', name:'Kylian Mbappe', short:'Mbappe', number:10, pos:'ST', country:'FR', age:27, matches:42, goals:38, assists:8, minutes:3650, tackles:14, interceptions:10, duelsWon:50, passAcc:80, keyPasses:42 },
+    { id:'dembele', name:'Ousmane Dembele', short:'Dembele', number:11, pos:'RW', country:'FR', age:28, matches:36, goals:16, assists:12, minutes:2900, tackles:22, interceptions:14, duelsWon:58, passAcc:82, keyPasses:48 },
+    { id:'kolomuani', name:'Randal Kolo Muani', short:'Kolo Muani', number:12, pos:'ST', country:'FR', age:26, matches:28, goals:10, assists:4, minutes:1960, tackles:18, interceptions:12, duelsWon:56, passAcc:78, keyPasses:24 },
+    { id:'barcola', name:'Bradley Barcola', short:'Barcola', number:20, pos:'LW', country:'FR', age:22, matches:22, goals:8, assists:6, minutes:1540, tackles:16, interceptions:10, duelsWon:54, passAcc:81, keyPasses:32 },
+    { id:'mthuram', name:'Marcus Thuram', short:'Thuram', number:15, pos:'ST', country:'FR', age:28, matches:30, goals:12, assists:5, minutes:2340, tackles:20, interceptions:14, duelsWon:58, passAcc:79, keyPasses:30 },
+    { id:'olise', name:'Michael Olise', short:'Olise', number:25, pos:'RW', country:'FR', age:23, matches:16, goals:4, assists:5, minutes:1080, tackles:12, interceptions:8, duelsWon:52, passAcc:83, keyPasses:28 },
+  ],
+};
+
+const allPlayers = [...playersData.goalkeepers, ...playersData.defenders, ...playersData.midfielders, ...playersData.forwards];
+
+const matchesData = [
+  { id:1, home:'France', away:'Canada', homeScore:null, awayScore:null, date:'2026-06-12', comp:'World Cup Group I', status:'UPCOMING', time:'20:00 EST' },
+  { id:2, home:'France', away:'Israel', homeScore:null, awayScore:null, date:'2026-06-18', comp:'World Cup Group I', status:'UPCOMING', time:'18:00 EST' },
+  { id:3, home:'France', away:'New Zealand', homeScore:null, awayScore:null, date:'2026-06-24', comp:'World Cup Group I', status:'UPCOMING', time:'15:00 EST' },
+];
+
+const newsData = [
+  { id:1, title:`Mbappe named France captain for World Cup 2026`, excerpt:`Deschamps confirms Kylian Mbappe will lead Les Bleus in pursuit of a third World Cup title.`, time:'2h ago', tag:'National Team', icon:'trophy', image:'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600' },
+  { id:2, title:`France unveils 26-man World Cup squad`, excerpt:`Deschamps includes surprise call-ups as Les Bleus aim for glory in North America.`, time:'5h ago', tag:'Squad', icon:'flame', image:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600' },
+  { id:3, title:`Griezmann: "This is my final World Cup"`, excerpt:`The Atletico Madrid star confirms 2026 will be his last appearance on football's biggest stage.`, time:'1d ago', tag:'Interview', icon:'star', image:'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600' },
+  { id:4, title:`Training camp opens in Clairefontaine`, excerpt:`Les Bleus begin intensive preparations ahead of departure to the United States.`, time:'2d ago', tag:'Training', icon:'target', image:'https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=600' },
+  { id:5, title:`Tactical analysis: France's 4-2-3-1 shape`, excerpt:`How Deschamps plans to balance attack and defence with a star-studded lineup.`, time:'3d ago', tag:'Tactics', icon:'heart', image:'https://images.unsplash.com/photo-1522778119026-d647f0565c6a?w=600' },
+];
+
+const topicsData = [
+  { id:1, author:'BleuFan_98', avatar:'B', title:'Will France win the 2026 World Cup?', replies:342, likes:890, time:'2h ago', hot:true },
+  { id:2, author:'FootballAnalyst', avatar:'F', title:'Mbappe vs Messi: Who scores more in the group stage?', replies:128, likes:456, time:'5h ago', hot:true },
+  { id:3, author:'Tactician_FR', avatar:'T', title:'Deschamps starting XI predictions', replies:89, likes:234, time:'8h ago', hot:false },
+  { id:4, author:'WorldCupDreamer', avatar:'W', title:'France vs Argentina final rematch?', replies:567, likes:1234, time:'1d ago', hot:true },
+  { id:5, author:'LesBleusHistory', avatar:'L', title:'Best French performance at a World Cup?', replies:45, likes:178, time:'2d ago', hot:false },
+];
+
+const countryFlags = { 'ES':'🇪🇸','FR':'🇫🇷','BR':'🇧🇷','GB':'🇬🇧','BE':'🇧🇪','UA':'🇺🇦','DE':'🇩🇪','NL':'🇳🇱','UY':'🇺🇾','TR':'🇹🇷','MA':'🇲🇦','AR':'🇦🇷' };
+
+// ==================== ICONS ====================
+function Icon({name,size=20,className=''}){
+  const s={width:size,height:size,strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'};
+  const icons={
+    home:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    users:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
+    layout:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
+    barChart:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>,
+    messageCircle:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>,
+    trophy:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>,
+    arrowLeft:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+    chevronRight:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polyline points="9 18 15 12 9 6"/></svg>,
+    flame:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-15 0c0-1.8.8-3.8 2-5.5"/></svg>,
+    heart:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>,
+    share:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>,
+    search:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    bell:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
+    target:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+    trendingUp:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
+    star:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    clock:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    check:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polyline points="20 6 9 17 4 12"/></svg>,
+    x:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    moreHorizontal:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>,
+    calendar:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+    zap:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+    shield:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    activity:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...s}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  };
+  return <span className={className}>{icons[name]||null}</span>;
+}
+
+function PlayerAvatar({name,size=40}){
+  const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  const colors=['#002395','#ED2939','#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
+  const color=colors[name.length%colors.length];
+  return (
+    <div className="rounded-full flex items-center justify-center font-bold text-white select-none" style={{width:size,height:size,background:color,fontSize:size*0.35}}>
+      {initials}
+    </div>
+  );
+}
+
+function CountryFlag({code}){
+  return <span className="text-base">{countryFlags[code]||'🏳️'}</span>;
+}
+
+// ==================== MATCH CENTER ====================
+function MatchCenter({t,lang}){
+  const [activeMatch,setActiveMatch]=useState(0);
+  const [selectedNews,setSelectedNews]=useState(null);
+  const match=matchesData[activeMatch];
+
+  return (
+    <div className="pb-28 fade-in">
+      <div className="px-5 pt-14 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-white text-2xl font-bold">{t('matchCenter')}</h1>
+            <p className="text-rm-muted text-sm mt-0.5">{t('season')}</p>
+          </div>
+          <div className="flex gap-2">
+            <button className="w-10 h-10 rounded-full bg-rm-card flex items-center justify-center text-white hover:bg-rm-border transition-colors">
+              <Icon name="search" size={18}/>
+            </button>
+            <button className="w-10 h-10 rounded-full bg-rm-card flex items-center justify-center text-white hover:bg-rm-border transition-colors relative">
+              <Icon name="bell" size={18}/>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-5 mb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {matchesData.map((m,i)=> (
+            <button key={m.id} onClick={()=>setActiveMatch(i)} className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${activeMatch===i?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
+              {m.comp} {m.status==='UPCOMING'?'· Upcoming':''}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="bg-rm-card rounded-3xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-rm-blue/8 rounded-full -translate-y-1/2 translate-x-1/3"></div>
+          <div className="relative">
+            <div className="flex items-center justify-between mb-6">
+              <div className="text-center flex-1">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-2 backdrop-blur-sm">
+                  <span className="text-xl font-black text-white">FR</span>
+                </div>
+                <p className="text-white font-semibold text-sm">{match.home}</p>
+              </div>
+              <div className="text-center px-4">
+                {match.status==='FT'?(
+                  <div>
+                    <div className="text-5xl font-black text-white font-mono tracking-tight">{match.homeScore} <span className="text-rm-muted">-</span> {match.awayScore}</div>
+                    <span className="inline-flex items-center gap-1 text-rm-gold text-xs font-semibold mt-1.5 px-2 py-0.5 rounded-full bg-rm-gold/10">
+                      <Icon name="check" size={12}/> FULL TIME
+                    </span>
+                  </div>
+                ):(
+                  <div>
+                    <div className="text-2xl font-black text-white font-mono">VS</div>
+                    <span className="text-rm-gold text-xs font-semibold mt-1 inline-block">{match.time}</span>
+                    <p className="text-rm-muted text-xs mt-0.5">{match.date}</p>
+                  </div>
+                )}
+              </div>
+              <div className="text-center flex-1">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 flex items-center justify-center mb-2 backdrop-blur-sm">
+                  <span className="text-lg font-black text-white">{match.away==='ISR'?'FCB':match.away==='CAN'?'ATM':'NZL'}</span>
+                </div>
+                <p className="text-white font-semibold text-sm">{match.away}</p>
+              </div>
+            </div>
+            {match.status==='FT' && (
+              <div className="bg-rm-surface rounded-xl p-3 flex items-center gap-3">
+                <Icon name="trophy" size={16} className="text-rm-gold flex-shrink-0"/>
+                <span className="text-white text-sm">{t('motm')}: <span className="text-rm-gold font-semibold">{match.motm}</span></span>
+              </div>
+            )}
+            {match.status==='UPCOMING' && (
+              <div className="bg-rm-surface rounded-xl p-3 flex items-center gap-3">
+                <Icon name="clock" size={16} className="text-rm-blue flex-shrink-0"/>
+                <span className="text-white text-sm">{t('kickoffIn')} <span className="text-rm-gold font-semibold">7 days</span></span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {match.status==='FT' && (
+        <div className="px-5 mb-5">
+          <h2 className="text-white font-semibold mb-3">Match Stats</h2>
+          <div className="bg-rm-card rounded-2xl p-4 space-y-4">
+            {[
+              {label:'Possession',home:match.possession.h,away:match.possession.a},
+              {label:'Shots',home:match.shots.h,away:match.shots.a},
+              {label:'Shots on Target',home:match.sot.h,away:match.sot.a},
+              {label:'Corners',home:match.corners.h,away:match.corners.a},
+              {label:'Fouls',home:match.fouls.h,away:match.fouls.a},
+            ].map(stat=>{
+              const total=stat.home+stat.away;
+              const homePct=total>0?(stat.home/total)*100:50;
+              return (
+                <div key={stat.label}>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="text-white font-mono font-semibold">{stat.home}</span>
+                    <span className="text-rm-muted">{stat.label}</span>
+                    <span className="text-white font-mono font-semibold">{stat.away}</span>
+                  </div>
+                  <div className="flex gap-1 h-2">
+                    <div className="flex-1 bg-rm-surface rounded-full overflow-hidden">
+                      <div className="h-full bg-rm-blue rounded-full transition-all duration-700" style={{width:`${homePct}%`}}></div>
+                    </div>
+                    <div className="flex-1 bg-rm-surface rounded-full overflow-hidden">
+                      <div className="h-full bg-white/25 rounded-full transition-all duration-700" style={{width:`${100-homePct}%`}}></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="px-5 mb-5">
+        <h2 className="text-white font-semibold mb-3">Latest News</h2>
+        <div className="space-y-3">
+          {newsData.map(news=> (
+            <div key={news.id} onClick={()=>setSelectedNews(news)} className="bg-rm-card rounded-2xl p-4 flex items-start gap-3 active:scale-[0.98] transition-transform cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-rm-blue/15 flex items-center justify-center flex-shrink-0">
+                <Icon name={news.icon} size={18} className="text-rm-blue"/>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-sm font-medium leading-snug">{news.title}</p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-rm-gold/15 text-rm-gold font-medium">{news.tag}</span>
+                  <span className="text-rm-muted text-xs">{news.time}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* News Detail Modal */}
+      {selectedNews&&(
+        <div className="fixed inset-0 z-[60] flex items-end justify-center" onClick={()=>setSelectedNews(null)}>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={()=>setSelectedNews(null)}></div>
+          <div className="relative w-full max-w-[430px] bg-rm-card rounded-t-3xl max-h-[85vh] overflow-y-auto scrollbar-hide slide-up" onClick={e=>e.stopPropagation()}>
+            <div className="sticky top-0 bg-rm-card/95 backdrop-blur-xl z-10 px-5 pt-4 pb-3 border-b border-white/5 flex items-center justify-between">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-rm-gold/15 text-rm-gold font-medium">{selectedNews.tag}</span>
+              <button onClick={()=>setSelectedNews(null)} className="w-8 h-8 rounded-full bg-rm-surface flex items-center justify-center text-rm-muted hover:text-white">
+                <Icon name="x" size={16}/>
+              </button>
+            </div>
+            <div className="px-5 py-4">
+              {selectedNews.image&&(
+                <div className="w-full h-48 rounded-2xl overflow-hidden mb-4">
+                  <img src={selectedNews.image} alt={selectedNews.title} className="w-full h-full object-cover" onError={e=>e.target.style.display='none'}/>
+                </div>
+              )}
+              <h2 className="text-white text-xl font-bold leading-snug mb-3">{selectedNews.title}</h2>
+              <p className="text-rm-muted text-sm leading-relaxed mb-4">{selectedNews.excerpt}</p>
+              <div className="flex items-center gap-2 text-xs text-rm-muted">
+                <Icon name="clock" size={12}/>
+                <span>{selectedNews.time}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== SQUAD ====================
+function Squad({t,lang,onPlayerSelect}){
+  const [selectedPos,setSelectedPos]=useState('ALL');
+  const positions={'ALL':'All','GK':'Goalkeepers','DEF':'Defenders','MID':'Midfielders','FWD':'Forwards'};
+
+  const getFiltered=()=>{
+    if(selectedPos==='ALL')return allPlayers;
+    if(selectedPos==='GK')return playersData.goalkeepers;
+    if(selectedPos==='DEF')return playersData.defenders;
+    if(selectedPos==='MID')return playersData.midfielders;
+    if(selectedPos==='FWD')return playersData.forwards;
+    return allPlayers;
+  };
+
+  return (
+    <div className="pb-28 fade-in">
+      <div className="px-5 pt-14 pb-4">
+        <h1 className="text-white text-2xl font-bold">{t('squad')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">{t('season')} · {allPlayers.length} {t('playersCount')}</p>
+      </div>
+
+      <div className="px-5 mb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {Object.entries(positions).map(([key,label])=> (
+            <button key={key} onClick={()=>setSelectedPos(key)} className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${selectedPos===key?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5">
+        <div className="grid grid-cols-2 gap-3">
+          {getFiltered().map(player=> (
+            <button key={player.id} onClick={()=>onPlayerSelect(player)} className="bg-rm-card rounded-2xl p-4 text-left active:scale-[0.97] transition-transform">
+              <div className="flex items-start justify-between mb-3">
+                <PlayerAvatar name={player.name} size={48}/>
+                <span className="text-2xl font-black text-white/10 font-mono">{player.number||'-'}</span>
+              </div>
+              <p className="text-white font-semibold text-sm">{player.short}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <CountryFlag code={player.country}/>
+                <span className="text-rm-muted text-xs">{player.pos} · {player.age}y</span>
+              </div>
+              <div className="flex gap-3 mt-3 pt-3 border-t border-white/5">
+                <div><p className="text-white font-bold text-sm font-mono">{player.matches}</p><p className="text-rm-muted text-[10px]">Apps</p></div>
+                <div><p className="text-white font-bold text-sm font-mono">{player.goals}</p><p className="text-rm-muted text-[10px]">Goals</p></div>
+                <div><p className="text-white font-bold text-sm font-mono">{player.assists}</p><p className="text-rm-muted text-[10px]">Assts</p></div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==================== PLAYER DETAIL ====================
+function PlayerDetail({t,lang,player,onBack}){
+  const [activeTab,setActiveTab]=useState('overview');
+  const tabs={overview:t('overview'),stats:t('stats'),career:t('career')};
+
+  const statCats=[
+    {label:'World Cup',matches:Math.floor(player.matches*0.7),goals:Math.floor(player.goals*0.6),assists:Math.floor(player.assists*0.7),minutes:Math.floor(player.minutes*0.7),saves:Math.floor((player.saves||0)*0.65)},
+    {label:'Friendly',matches:Math.floor(player.matches*0.25),goals:Math.floor(player.goals*0.35),assists:Math.floor(player.assists*0.25),minutes:Math.floor(player.minutes*0.25),saves:Math.floor((player.saves||0)*0.3)},
+    {label:'Copa del Rey',matches:Math.floor(player.matches*0.05),goals:Math.floor(player.goals*0.05),assists:Math.floor(player.assists*0.05),minutes:Math.floor(player.minutes*0.05),saves:Math.floor((player.saves||0)*0.05)},
+  ];
+
+  const radarData=[
+    {label:'Attack',value:Math.min(100,player.pos==='GK'?10:player.goals*2.5)},
+    {label:'Defense',value:Math.min(100,player.pos==='GK'?85:(player.tackles||20)*1.2)},
+    {label:'Passing',value:player.passAcc||75},
+    {label:'Physical',value:Math.min(100,(player.minutes||1000)/40)},
+    {label:'Efficiency',value:Math.min(100,player.matches>0?(player.goals+player.assists)*2.5:30)},
+  ];
+
+  const maxRadar=Math.max(...radarData.map(d=>d.value));
+
+  return (
+    <div className="pb-28 slide-up">
+      <div className="px-5 pt-14 pb-4 flex items-center gap-3">
+        <button onClick={onBack} className="w-10 h-10 rounded-full bg-rm-card flex items-center justify-center text-white active:scale-90 transition-transform">
+          <Icon name="arrowLeft" size={20}/>
+        </button>
+        <h1 className="text-white text-lg font-bold">Player Profile</h1>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="bg-rm-card rounded-3xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-rm-blue/8 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+          <div className="relative flex items-center gap-5">
+            <div className="relative">
+              <PlayerAvatar name={player.name} size={88}/>
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-rm-gold flex items-center justify-center text-black text-sm font-black border-2 border-rm-card">{player.number||'-'}</div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-white text-2xl font-bold truncate">{player.short}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <CountryFlag code={player.country}/>
+                <span className="text-rm-muted text-sm">{player.pos}</span>
+              </div>
+              <div className="flex gap-5 mt-3">
+                <div><p className="text-white font-bold text-xl font-mono">{player.age}</p><p className="text-rm-muted text-[10px]">Age</p></div>
+                <div><p className="text-white font-bold text-xl font-mono">{player.matches}</p><p className="text-rm-muted text-[10px]">Apps</p></div>
+                <div><p className="text-white font-bold text-xl font-mono">{player.goals}</p><p className="text-rm-muted text-[10px]">Goals</p></div>
+                <div><p className="text-white font-bold text-xl font-mono">{player.assists}</p><p className="text-rm-muted text-[10px]">Assts</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-5 mb-4">
+        <div className="flex gap-2">
+          {Object.entries(tabs).map(([key,label])=> (
+            <button key={key} onClick={()=>setActiveTab(key)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab===key?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5">
+        {activeTab==='overview' && (
+          <div className="space-y-4">
+            <div className="bg-rm-card rounded-2xl p-4">
+              <h3 className="text-white font-semibold mb-3">Season Stats</h3>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  {label:'Minutes',value:player.minutes},
+                  {label:'Goals',value:player.goals},
+                  {label:'Assists',value:player.assists},
+                  {label:player.pos==='GK'?'Saves':'Tackles',value:player.saves||player.tackles||0},
+                ].map(s=> (
+                  <div key={s.label} className="text-center">
+                    <p className="text-white font-bold text-lg font-mono">{s.value}</p>
+                    <p className="text-rm-muted text-[10px]">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Radar Chart */}
+            <div className="bg-rm-card rounded-2xl p-4">
+              <h3 className="text-white font-semibold mb-3">Performance Radar</h3>
+              <div className="flex items-center justify-center py-2">
+                <svg viewBox="0 0 200 200" className="w-56 h-56">
+                  <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+                  <polygon points="100,50 145,75 145,125 100,150 55,125 55,75" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+                  <polygon points="100,80 120,92 120,118 100,130 80,118 80,92" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+                  {[0,1,2,3,4,5].map(i=>{
+                    const angle=(Math.PI*2*i/5)-Math.PI/2;
+                    return <line key={i} x1="100" y1="100" x2={100+80*Math.cos(angle)} y2={100+80*Math.sin(angle)} stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>;
+                  })}
+                  <polygon points={radarData.map((d,i)=>{
+                    const angle=(Math.PI*2*i/5)-Math.PI/2;
+                    const r=(d.value/maxRadar)*80;
+                    return `${100+r*Math.cos(angle)},${100+r*Math.sin(angle)}`;
+                  }).join(' ')} fill="rgba(0,82,159,0.25)" stroke="#002395" strokeWidth="2"/>
+                  {radarData.map((d,i)=>{
+                    const angle=(Math.PI*2*i/5)-Math.PI/2;
+                    const r=(d.value/maxRadar)*80;
+                    return <g key={i}><circle cx={100+r*Math.cos(angle)} cy={100+r*Math.sin(angle)} r="3" fill="#ED2939"/>
+                    <text x={100+95*Math.cos(angle)} y={100+95*Math.sin(angle)} fill="#6B6B7B" fontSize="10" textAnchor="middle" dominantBaseline="middle">{d.label}</text></g>;
+                  })}
+                </svg>
+              </div>
+            </div>
+
+            {player.goals>0 && (
+              <div className="bg-rm-card rounded-2xl p-4">
+                <h3 className="text-white font-semibold mb-3">Goals Breakdown</h3>
+                <div className="space-y-3">
+                  {[
+                    {label:'Right Foot',value:Math.floor(player.goals*0.55),max:player.goals},
+                    {label:'Left Foot',value:Math.floor(player.goals*0.3),max:player.goals},
+                    {label:'Header',value:Math.floor(player.goals*0.1),max:player.goals},
+                    {label:'Other',value:Math.floor(player.goals*0.05),max:player.goals},
+                  ].map(g=> (
+                    <div key={g.label}>
+                      <div className="flex justify-between text-xs mb-1"><span className="text-white">{g.label}</span><span className="text-rm-muted">{g.value}</span></div>
+                      <div className="stat-bar-bg"><div className="stat-bar-fill bg-rm-gold" style={{width:`${(g.value/g.max)*100}%`}}></div></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab==='stats' && (
+          <div className="space-y-3">
+            {statCats.map(cat=> (
+              <div key={cat.label} className="bg-rm-card rounded-2xl p-4">
+                <h3 className="text-white font-semibold mb-3">{cat.label}</h3>
+                <div className="grid grid-cols-4 gap-3">
+                  {[
+                    {label:'Matches',value:cat.matches},
+                    {label:'Goals',value:cat.goals},
+                    {label:'Assists',value:cat.assists},
+                    {label:'Minutes',value:cat.minutes},
+                  ].map(s=> (
+                    <div key={s.label} className="text-center">
+                      <p className="text-white font-bold text-base font-mono">{s.value}</p>
+                      <p className="text-rm-muted text-[10px]">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeTab==='career' && (
+          <div className="bg-rm-card rounded-2xl p-4">
+            <div className="relative pl-6 space-y-6">
+              <div className="absolute left-2 top-2 bottom-2 w-px bg-rm-border"></div>
+              {[
+                {year:'2024 - Present',club:'France National Team',desc:`${player.matches} apps · ${player.goals} goals`,active:true},
+                {year:'2022 - 2024',club:'Previous Club',desc:'48 apps · 22 goals',active:false},
+                {year:'2020 - 2022',club:'Youth Career',desc:'Academy progression',active:false},
+              ].map((item,i)=> (
+                <div key={i} className="relative">
+                  <div className={`absolute -left-4 top-1 w-2.5 h-2.5 rounded-full ${item.active?'bg-rm-gold':'bg-rm-border'}`}></div>
+                  <p className={`text-xs font-medium ${item.active?'text-rm-gold':'text-rm-muted'}`}>{item.year}</p>
+                  <p className="text-white font-semibold text-sm mt-0.5">{item.club}</p>
+                  <p className="text-rm-muted text-xs">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ==================== TACTICS ====================
+function Tactics({t,lang}){
+  const [formation,setFormation]=useState('433');
+  const formations={
+    '433':[
+      {pos:'GK',x:50,y:88,player:'Courtois'},
+      {pos:'RB',x:78,y:70,player:'Trent'},
+      {pos:'CB',x:60,y:72,player:'Rudiger'},
+      {pos:'CB',x:40,y:72,player:'Militao'},
+      {pos:'LB',x:22,y:70,player:'Mendy'},
+      {pos:'CM',x:65,y:48,player:'Valverde'},
+      {pos:'DM',x:50,y:52,player:'Tchouameni'},
+      {pos:'CM',x:35,y:48,player:'Bellingham'},
+      {pos:'RW',x:72,y:25,player:'Rodrygo'},
+      {pos:'ST',x:50,y:20,player:'Mbappe'},
+      {pos:'LW',x:28,y:25,player:'Vini Jr.'},
+    ],
+    '442':[
+      {pos:'GK',x:50,y:88,player:'Courtois'},
+      {pos:'RB',x:78,y:70,player:'Trent'},
+      {pos:'CB',x:60,y:72,player:'Rudiger'},
+      {pos:'CB',x:40,y:72,player:'Militao'},
+      {pos:'LB',x:22,y:70,player:'Mendy'},
+      {pos:'RM',x:78,y:45,player:'Rodrygo'},
+      {pos:'CM',x:60,y:50,player:'Valverde'},
+      {pos:'CM',x:40,y:50,player:'Bellingham'},
+      {pos:'LM',x:22,y:45,player:'Vini Jr.'},
+      {pos:'ST',x:55,y:22,player:'Mbappe'},
+      {pos:'ST',x:45,y:22,player:'Endrick'},
+    ],
+    '4231':[
+      {pos:'GK',x:50,y:88,player:'Courtois'},
+      {pos:'RB',x:78,y:70,player:'Trent'},
+      {pos:'CB',x:60,y:72,player:'Rudiger'},
+      {pos:'CB',x:40,y:72,player:'Militao'},
+      {pos:'LB',x:22,y:70,player:'Mendy'},
+      {pos:'DM',x:58,y:55,player:'Tchouameni'},
+      {pos:'DM',x:42,y:55,player:'Camavinga'},
+      {pos:'AM',x:50,y:38,player:'Bellingham'},
+      {pos:'RW',x:72,y:28,player:'Rodrygo'},
+      {pos:'ST',x:50,y:20,player:'Mbappe'},
+      {pos:'LW',x:28,y:28,player:'Vini Jr.'},
+    ],
+  };
+
+  return (
+    <div className="pb-28 fade-in">
+      <div className="px-5 pt-14 pb-4">
+        <h1 className="text-white text-2xl font-bold">{t('tactics')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">Formation & Analysis</p>
+      </div>
+
+      <div className="px-5 mb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {Object.keys(formations).map(f=> (
+            <button key={f} onClick={()=>setFormation(f)} className={`flex-shrink-0 flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${formation===f?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
+              {f==='433'?'4-3-3':f==='442'?'4-4-2':'4-2-3-1'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="field-bg rounded-3xl aspect-[3/4] relative overflow-hidden">
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-white/15"></div>
+          <div className="absolute top-1/2 left-1/2 w-20 h-20 border border-white/15 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute top-0 left-1/2 w-32 h-16 border border-white/15 -translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-1/2 w-32 h-16 border border-white/15 -translate-x-1/2"></div>
+          {formations[formation].map((p,i)=> (
+            <div key={i} className="absolute" style={{left:`${p.x}%`,top:`${p.y}%`,transform:'translate(-50%,-50%)'}}>
+              <div className="player-dot w-11 h-11 rounded-full bg-rm-blue flex items-center justify-center">
+                <span className="text-white text-[10px] font-bold">{p.pos}</span>
+              </div>
+              <p className="text-white text-[10px] font-medium text-center mt-1 whitespace-nowrap bg-black/60 px-1.5 py-0.5 rounded backdrop-blur-sm">{p.player}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="bg-rm-card rounded-2xl p-4">
+          <h3 className="text-white font-semibold mb-2">Formation Analysis</h3>
+          <p className="text-rm-muted text-sm leading-relaxed">
+            The {formation==='433'?'4-3-3':formation==='442'?'4-4-2':'4-2-3-1'} provides {formation==='433'?'strong wing play with attacking fullbacks and a solid midfield trio':formation==='442'?'defensive solidity with two banks of four and dual strikers':'a diamond midfield with a dedicated playmaker behind the striker'}.
+            Used in {formation==='433'?'68%':formation==='442'?'18%':'14%'} of matches this season.
+          </p>
+        </div>
+      </div>
+
+      <div className="px-5 mb-5">
+        <h2 className="text-white font-semibold mb-3">Pass Network</h2>
+        <div className="bg-rm-card rounded-2xl p-4">
+          <div className="relative h-52">
+            {[
+              {from:{x:50,y:82},to:{x:60,y:68},w:4},{from:{x:50,y:82},to:{x:40,y:68},w:4},
+              {from:{x:60,y:68},to:{x:65,y:48},w:5},{from:{x:65,y:48},to:{x:72,y:28},w:3},
+              {from:{x:40,y:68},to:{x:35,y:48},w:5},{from:{x:35,y:48},to:{x:28,y:28},w:3},
+              {from:{x:50,y:55},to:{x:50,y:22},w:6},{from:{x:65,y:48},to:{x:50,y:22},w:4},
+            ].map((line,i)=> (
+              <svg key={i} className="absolute inset-0 w-full h-full" style={{overflow:'visible'}}>
+                <line x1={`${line.from.x}%`} y1={`${line.from.y}%`} x2={`${line.to.x}%`} y2={`${line.to.y}%`} stroke="rgba(212,175,55,0.45)" strokeWidth={line.w} strokeLinecap="round"/>
+              </svg>
+            ))}
+            {[
+              {x:50,y:82,l:'Tchoua'},{x:60,y:68,l:'Rudiger'},{x:40,y:68,l:'Militao'},
+              {x:65,y:48,l:'Valverde'},{x:35,y:48,l:'Bellingham'},{x:50,y:55,l:'Tchoua'},
+              {x:72,y:28,l:'Rodrygo'},{x:28,y:28,l:'Vini'},{x:50,y:22,l:'Mbappe'},
+            ].map((node,i)=> (
+              <div key={i} className="absolute" style={{left:`${node.x}%`,top:`${node.y}%`,transform:'translate(-50%,-50%)'}}>
+                <div className="w-5 h-5 rounded-full bg-rm-gold/80 flex items-center justify-center">
+                  <span className="text-black text-[8px] font-bold">{i+1}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-rm-muted text-xs mt-2">Line thickness indicates pass frequency</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==================== DATA ====================
+function Data({t,lang}){
+  const [activeRank,setActiveRank]=useState('goals');
+  const ranks={
+    goals:{label:'Goals',key:'goals',icon:'target'},
+    assists:{label:'Assists',key:'assists',icon:'share'},
+    minutes:{label:'Minutes',key:'minutes',icon:'trendingUp'},
+    matches:{label:'Appearances',key:'matches',icon:'users'},
+    saves:{label:'Saves',key:'saves',icon:'shield'},
+  };
+
+  const sorted=[...allPlayers].sort((a,b)=>{
+    const av=a[ranks[activeRank].key]||0;
+    const bv=b[ranks[activeRank].key]||0;
+    return bv-av;
+  }).slice(0,10);
+  const maxVal=Math.max(...sorted.map(p=>p[ranks[activeRank].key]||0));
+
+  return (
+    <div className="pb-28 fade-in">
+      <div className="px-5 pt-14 pb-4">
+        <h1 className="text-white text-2xl font-bold">{t('data')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">{t('season')} {t('rankings')}</p>
+      </div>
+
+      <div className="px-5 mb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {Object.entries(ranks).map(([key,r])=> (
+            <button key={key} onClick={()=>setActiveRank(key)} className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeRank===key?'bg-rm-blue text-white shadow-lg shadow-rm-blue/25':'bg-rm-card text-rm-muted'}`}>
+              <Icon name={r.icon} size={14}/>{r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5">
+        <div className="bg-rm-card rounded-2xl overflow-hidden">
+          {sorted.map((player,i)=> {
+            const val=player[ranks[activeRank].key]||0;
+            return (
+              <div key={player.id} className={`flex items-center gap-3 px-4 py-3 ${i!==sorted.length-1?'border-b border-white/5':''}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${i<3?'bg-rm-gold text-black':'bg-rm-surface text-rm-muted'}`}>{i+1}</div>
+                <PlayerAvatar name={player.name} size={36}/>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm font-semibold truncate">{player.short}</p>
+                  <p className="text-rm-muted text-xs">{player.pos}</p>
+                </div>
+                <div className="text-right mr-1">
+                  <p className="text-white font-bold font-mono">{val}</p>
+                  <p className="text-rm-muted text-[10px]">{ranks[activeRank].label}</p>
+                </div>
+                <div className="w-14">
+                  <div className="stat-bar-bg"><div className="stat-bar-fill bg-rm-blue" style={{width:`${maxVal>0?(val/maxVal)*100:0}%`}}></div></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="px-5 mt-5">
+        <h2 className="text-white font-semibold mb-3">Team Overview</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            {label:t('goalsScored'),value:'112',sub:'+18% vs last season',good:true},
+            {label:t('goalsConceded'),value:'34',sub:'-8% vs last season',good:true},
+            {label:t('cleanSheets'),value:'18',sub:'Best in World Cup',good:true},
+            {label:t('winRate'),value:'76%',sub:'33W 5D 6L',good:true},
+          ].map(s=> (
+            <div key={s.label} className="bg-rm-card rounded-2xl p-4">
+              <p className="text-rm-muted text-xs">{s.label}</p>
+              <p className="text-white text-2xl font-bold font-mono mt-1">{s.value}</p>
+              <p className={`text-[10px] mt-1 ${s.good?'text-green-400':'text-red-400'}`}>{s.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==================== COMMUNITY ====================
+function Community({t,lang}){
+  const [prediction,setPrediction]=useState(Storage.get('prediction',null));
+  const [vote,setVote]=useState(Storage.get('vote',null));
+  const [likedTopics,setLikedTopics]=useState(Storage.get('likedTopics',[]));
+  const [showPredModal,setShowPredModal]=useState(false);
+  const [predHome,setPredHome]=useState('');
+  const [predAway,setPredAway]=useState('');
+
+  const pollOptions=[
+    {label:'Trent Alexander-Arnold',votes:1245,percent:62},
+    {label:'Dani Carvajal',votes:520,percent:26},
+    {label:'Lucas Vazquez',votes:240,percent:12},
+  ];
+
+  const handleVote=(idx)=>{
+    if(vote!==null)return;
+    Storage.set('vote',idx);
+    setVote(idx);
+  };
+
+  const handlePredict=()=>{
+    if(predHome&&predAway){
+      const p={home:parseInt(predHome),away:parseInt(predAway),date:new Date().toISOString()};
+      Storage.set('prediction',p);
+      setPrediction(p);
+      setShowPredModal(false);
+    }
+  };
+
+  const toggleLike=(id)=>{
+    const next=likedTopics.includes(id)?likedTopics.filter(x=>x!==id):[...likedTopics,id];
+    setLikedTopics(next);
+    Storage.set('likedTopics',next);
+  };
+
+  return (
+    <div className="pb-28 fade-in">
+      <div className="px-5 pt-14 pb-4">
+        <h1 className="text-white text-2xl font-bold">{t('community')}</h1>
+        <p className="text-rm-muted text-sm mt-0.5">Join the conversation</p>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="bg-rm-card rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-white font-semibold">Next Match Prediction</h3>
+            <span className="text-rm-gold text-xs font-medium">{prediction?'Submitted':'Open'}</span>
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-rm-blue flex items-center justify-center mx-auto mb-1"><span className="text-white font-bold text-sm">RM</span></div>
+              <span className="text-white text-xs">France National Team</span>
+            </div>
+            <div className="text-center px-4">
+              <p className="text-rm-muted text-xs">vs</p>
+              {prediction?(
+                <p className="text-white font-bold text-xl font-mono mt-1">{prediction.home} - {prediction.away}</p>
+              ):<p className="text-white font-bold text-xl font-mono mt-1">? - ?</p>}
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-1"><span className="text-white font-bold text-sm">ATM</span></div>
+              <span className="text-white text-xs">Atletico</span>
+            </div>
+          </div>
+          {!prediction?(
+            <button onClick={()=>setShowPredModal(true)} className="w-full py-3 bg-rm-blue rounded-xl text-white font-semibold text-sm hover:bg-rm-blue/90 transition-colors">Make Prediction</button>
+          ):<p className="text-rm-muted text-xs text-center">You predicted <span className="text-rm-gold font-semibold">{prediction.home}-{prediction.away}</span>. Good luck!</p>}
+        </div>
+      </div>
+
+      <div className="px-5 mb-5">
+        <div className="bg-rm-card rounded-2xl p-4">
+          <h3 className="text-white font-semibold mb-3">Fan Poll</h3>
+          <p className="text-rm-muted text-sm mb-3">Who should start as right-back vs Atletico?</p>
+          {pollOptions.map((opt,i)=> (
+            <button key={i} onClick={()=>handleVote(i)} disabled={vote!==null} className={`w-full mb-2.5 last:mb-0 ${vote===null?'cursor-pointer':'cursor-default'}`}>
+              <div className="flex justify-between text-xs mb-1"><span className={`${vote===i?'text-rm-gold font-semibold':'text-white'}`}>{opt.label}</span><span className="text-rm-muted">{vote!==null?`${opt.percent}%`:'Vote'}</span></div>
+              <div className="stat-bar-bg"><div className={`stat-bar-fill transition-all duration-700 ${vote===i?'bg-rm-gold':'bg-rm-blue'}`} style={{width:vote!==null?`${opt.percent}%`:'0%'}}></div></div>
+            </button>
+          ))}
+          <p className="text-rm-muted text-xs mt-2">2,005 votes · Ends in 2 days</p>
+        </div>
+      </div>
+
+      <div className="px-5">
+        <h2 className="text-white font-semibold mb-3">Hot Topics</h2>
+        <div className="space-y-3">
+          {topicsData.map(topic=> (
+            <div key={topic.id} className="bg-rm-card rounded-2xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-rm-blue flex items-center justify-center flex-shrink-0">
+                  <span className="text-white text-sm font-bold">{topic.avatar}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-white text-sm font-medium">{topic.author}</span>
+                    {topic.hot&&<span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-medium">HOT</span>}
+                    <span className="text-rm-muted text-xs">{topic.time}</span>
+                  </div>
+                  <p className="text-white text-sm leading-snug">{topic.title}</p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <span className="flex items-center gap-1 text-rm-muted text-xs"><Icon name="messageCircle" size={12}/> {topic.replies}</span>
+                    <button onClick={()=>toggleLike(topic.id)} className="flex items-center gap-1 text-xs transition-colors">
+                      <Icon name="heart" size={12} className={likedTopics.includes(topic.id)?'text-red-500':'text-rm-muted'}/>
+                      <span className={likedTopics.includes(topic.id)?'text-red-500':'text-rm-muted'}>{topic.likes+(likedTopics.includes(topic.id)?1:0)}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Prediction Modal */}
+      {showPredModal&&(
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" onClick={()=>setShowPredModal(false)}>
+          <div className="absolute inset-0 bg-black/70"></div>
+          <div className="relative w-full max-w-[430px] bg-rm-card rounded-t-3xl p-6 slide-up" onClick={e=>e.stopPropagation()}>
+            <div className="w-12 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
+            <h3 className="text-white text-lg font-bold mb-4">{t('predictScore')}</h3>
+            <div className="flex items-center justify-between mb-6">
+              <div className="text-center flex-1">
+                <p className="text-white font-semibold mb-2">France</p>
+                <input type="number" min="0" max="10" value={predHome} onChange={e=>setPredHome(e.target.value)} className="w-16 h-16 bg-rm-surface rounded-2xl text-white text-3xl font-bold text-center font-mono border border-rm-border focus:border-rm-blue outline-none" placeholder="0"/>
+              </div>
+              <span className="text-rm-muted text-xl font-bold px-4">-</span>
+              <div className="text-center flex-1">
+                <p className="text-white font-semibold mb-2">Atletico</p>
+                <input type="number" min="0" max="10" value={predAway} onChange={e=>setPredAway(e.target.value)} className="w-16 h-16 bg-rm-surface rounded-2xl text-white text-3xl font-bold text-center font-mono border border-rm-border focus:border-rm-blue outline-none" placeholder="0"/>
+              </div>
+            </div>
+            <button onClick={handlePredict} className="w-full py-3.5 bg-rm-blue rounded-xl text-white font-semibold text-sm">Submit Prediction</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==================== APP ====================
+function App(){
+  const [activeTab,setActiveTab]=useState('match');
+  const [selectedPlayer,setSelectedPlayer]=useState(null);
+  const {lang,t,setLanguage}=useLanguage();
+
+  const tabs=[
+    {id:'match',label:t('matchCenter'),icon:'home'},
+    {id:'squad',label:t('squad'),icon:'users'},
+    {id:'tactics',label:t('tactics'),icon:'layout'},
+    {id:'data',label:t('data'),icon:'barChart'},
+    {id:'community',label:t('community'),icon:'messageCircle'},
+  ];
+
+  return (
+    <div className="w-full max-w-[430px] min-h-screen bg-rm-dark relative overflow-hidden">
+      {/* Install prompt for PWA */}
+      <InstallPrompt t={t}/>
+
+      {/* Status bar */}
+      <div className="sticky top-0 z-50">
+        <div className="h-12 flex items-center justify-between px-6 bg-rm-dark/90 backdrop-blur-xl">
+          <span className="text-white text-sm font-semibold">9:41</span>
+          <div className="flex items-center gap-3">
+            <button onClick={()=>setLanguage(lang==='zh'?'en':'zh')} className="text-xs font-bold text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition-colors">
+              {lang==='zh'?'EN':'中文'}
+            </button>
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full bg-white/20"></div>
+              <div className="w-4 h-4 rounded-full bg-white/20"></div>
+              <div className="w-6 h-3 rounded-sm bg-white/40"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative">
+        {selectedPlayer?(
+          <PlayerDetail t={t} lang={lang} player={selectedPlayer} onBack={()=>setSelectedPlayer(null)}/>
+        ):(
+          <>
+            {activeTab==='match'&&<MatchCenter t={t} lang={lang}/>}
+            {activeTab==='squad'&&<Squad t={t} lang={lang} onPlayerSelect={setSelectedPlayer}/>}
+            {activeTab==='tactics'&&<Tactics t={t} lang={lang}/>}
+            {activeTab==='data'&&<Data t={t} lang={lang}/>}
+            {activeTab==='community'&&<Community t={t} lang={lang}/>}
+          </>
+        )}
+      </div>
+
+      {/* Bottom Nav */}
+      {!selectedPlayer&&(
+        <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center">
+          <div className="w-full max-w-[430px]">
+            <div className="glass border-t border-white/5">
+              <div className="flex items-center justify-around py-2 pb-7">
+                {tabs.map(tab=> (
+                  <button key={tab.id} onClick={()=>setActiveTab(tab.id)} className="flex flex-col items-center gap-1 py-1 px-3 min-w-[60px]">
+                    <Icon name={tab.icon} size={22} className={activeTab===tab.id?'text-rm-blue':'text-rm-muted'}/>
+                    <span className={`text-[10px] font-medium ${activeTab===tab.id?'text-rm-blue':'text-rm-muted'}`}>{tab.label}</span>
+                    {activeTab===tab.id&&<div className="w-1 h-1 rounded-full bg-rm-blue mt-0.5"></div>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InstallPrompt({t}){
+  const [show,setShow]=useState(false);
+  const [dismissed,setDismissed]=useState(Storage.get('installDismissed',false));
+
+  useEffect(()=>{
+    const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
+    if(!isStandalone&&!dismissed){
+      const t=setTimeout(()=>setShow(true),2000);
+      return ()=>clearTimeout(t);
+    }
+  },[dismissed]);
+
+  if(!show||dismissed)return null;
+
+  return (
+    <div className="fixed top-14 left-0 right-0 z-[60] flex justify-center px-4">
+      <div className="w-full max-w-[430px] bg-rm-card rounded-2xl p-4 shadow-2xl border border-rm-border flex items-center gap-3 slide-up">
+        <div className="w-10 h-10 rounded-xl bg-rm-blue flex items-center justify-center flex-shrink-0">
+          <span className="text-white font-black text-sm">RM</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white text-sm font-semibold">{t('addToHome')}</p>
+          <p className="text-rm-muted text-xs">{t('installDesc')}</p>
+        </div>
+        <button onClick={()=>{setShow(false);Storage.set('installDismissed',true);setDismissed(true);}} className="text-rm-muted hover:text-white transition-colors">
+          <Icon name="x" size={18}/>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Register Service Worker
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
