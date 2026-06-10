@@ -926,7 +926,7 @@ function Icon({name,size=20,className=''}){
 
 function PlayerAvatar({name,size=40}){
   const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-  const colors=[team.colors.blue,team.colors.gold,'#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
+  const colors=['var(--rm-blue)','var(--rm-gold)','#1A5FB4','#8B6914','#2E7D32','#C62828','#6A1B9A','#1565C0'];
   const color=colors[name.length%colors.length];
   return (
     <div className="rounded-full flex items-center justify-center font-bold text-white select-none" style={{width:size,height:size,background:color,fontSize:size*0.35}}>
