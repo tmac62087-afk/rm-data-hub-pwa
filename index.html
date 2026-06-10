@@ -21,7 +21,16 @@ tailwind.config = {
     extend: {
       fontFamily: { sans: ['Inter','system-ui'], mono: ['JetBrains Mono','monospace'] },
       colors: {
-        rm: team.colors
+        rm: {
+          blue: 'var(--rm-blue)',
+          gold: 'var(--rm-gold)',
+          dark: '#0A0A0F',
+          card: '#1A1A24',
+          surface: '#12121A',
+          border: '#2A2A3A',
+          muted: '#6B6B7B',
+          accent: '#3B82F6'
+        }
       }
     }
   }
@@ -869,6 +878,10 @@ function useTeam() {
     try { return localStorage.getItem('wc_team') || 'france'; } catch(e) { return 'france'; }
   });
   const team = teamsData[teamId] || teamsData.france;
+  useEffect(()=>{
+    document.documentElement.style.setProperty('--rm-blue', team.colors.blue);
+    document.documentElement.style.setProperty('--rm-gold', team.colors.gold);
+  },[team]);
   const setTeam = React.useCallback((id) => {
     setTeamId(id);
     try { localStorage.setItem('wc_team', id); } catch(e) {}
